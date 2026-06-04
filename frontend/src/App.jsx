@@ -441,6 +441,7 @@ export default function App() {
                 onEdit={editContribution}
                 onDelete={deleteContribution}
                 isAdmin={user.role === 'admin'}
+                currentUser={user}
               />
             )}
             {activeTab === 'expenses' && (
@@ -450,6 +451,7 @@ export default function App() {
                 onEdit={editExpense}
                 onDelete={deleteExpense}
                 isAdmin={user.role === 'admin'}
+                currentUser={user}
               />
             )}
             {activeTab === 'settlements' && (
@@ -461,6 +463,7 @@ export default function App() {
                 data={report} 
                 onDelete={deleteTransaction}
                 isAdmin={user.role === 'admin'}
+                currentUser={user}
               />
             )}
             {activeTab === 'reports' && (

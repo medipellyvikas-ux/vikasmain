@@ -411,14 +411,14 @@ router.get('/transactions', authenticateToken, async (req, res) => {
     // We combine contributions and expenses into a single unified stream
     const contributions = await queryAll(`
       SELECT c.id, c.date, 'contribution' as type, c.amount, m.name as member_name, c.member_id,
-             '' as category, c.remarks as description, c.closed_month
+             '' as category, c.remarks as description, NULL as receipt_base64, c.closed_month
       FROM contributions c
       JOIN members m ON c.member_id = m.id
     `);
 
     const expenses = await queryAll(`
       SELECT e.id, e.date, 'expense' as type, e.amount, m.name as member_name, e.paid_by_member_id as member_id,
-             e.category, e.description, e.closed_month
+             e.category, e.description, e.receipt_base64, e.closed_month
       FROM expenses e
       JOIN members m ON e.paid_by_member_id = m.id
     `);
@@ -485,7 +485,7 @@ router.post('/contributions', authenticateToken, async (req, res) => {
 });
 
 // Admin only edits/deletes
-router.put('/contributions/:id', authenticateToken, requireAdmin, async (req, res) => {
+router.put('/contributions/:id', authenticateToken, async (req, res) => {
   const contId = req.params.id;
   const { date, member_id, amount, payment_method, remarks } = req.body;
 
@@ -499,9 +499,17 @@ router.put('/contributions/:id', authenticateToken, requireAdmin, async (req, re
       return res.status(400).json({ message: 'Cannot edit contributions from a closed month' });
     }
 
+    const isAdmin = req.user.role === 'admin';
+    const isOwner = existing.member_id === req.user.id || existing.created_by === req.user.id;
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({ message: 'Unauthorized transaction modification' });
+    }
+
+    const targetMemberId = isAdmin ? member_id : existing.member_id;
+
     await queryRun(
       'UPDATE contributions SET date = ?, member_id = ?, amount = ?, payment_method = ?, remarks = ? WHERE id = ?',
-      [date, member_id, amount, payment_method, remarks, contId]
+      [date, targetMemberId, amount, payment_method, remarks, contId]
     );
 
     await logAction(
@@ -516,7 +524,7 @@ router.put('/contributions/:id', authenticateToken, requireAdmin, async (req, re
   }
 });
 
-router.delete('/contributions/:id', authenticateToken, requireAdmin, async (req, res) => {
+router.delete('/contributions/:id', authenticateToken, async (req, res) => {
   const contId = req.params.id;
 
   try {
@@ -527,6 +535,12 @@ router.delete('/contributions/:id', authenticateToken, requireAdmin, async (req,
 
     if (existing.closed_month) {
       return res.status(400).json({ message: 'Cannot delete contributions from a closed month' });
+    }
+
+    const isAdmin = req.user.role === 'admin';
+    const isOwner = existing.member_id === req.user.id || existing.created_by === req.user.id;
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({ message: 'Unauthorized transaction deletion' });
     }
 
     await queryRun('DELETE FROM contributions WHERE id = ?', [contId]);
@@ -589,7 +603,7 @@ router.post('/expenses', authenticateToken, async (req, res) => {
 });
 
 // Admin only edits/deletes
-router.put('/expenses/:id', authenticateToken, requireAdmin, async (req, res) => {
+router.put('/expenses/:id', authenticateToken, async (req, res) => {
   const expId = req.params.id;
   const { date, category, amount, paid_by_member_id, description, receipt_base64 } = req.body;
 
@@ -603,6 +617,14 @@ router.put('/expenses/:id', authenticateToken, requireAdmin, async (req, res) =>
       return res.status(400).json({ message: 'Cannot edit expenses from a closed month' });
     }
 
+    const isAdmin = req.user.role === 'admin';
+    const isOwner = existing.paid_by_member_id === req.user.id || existing.created_by === req.user.id;
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({ message: 'Unauthorized transaction modification' });
+    }
+
+    const targetPayerId = isAdmin ? paid_by_member_id : existing.paid_by_member_id;
+
     // Preserve receipt if new one isn't uploaded (null/undefined)
     let receiptToSave = receipt_base64;
     if (receipt_base64 === undefined) {
@@ -611,7 +633,7 @@ router.put('/expenses/:id', authenticateToken, requireAdmin, async (req, res) =>
 
     await queryRun(
       'UPDATE expenses SET date = ?, category = ?, amount = ?, paid_by_member_id = ?, description = ?, receipt_base64 = ? WHERE id = ?',
-      [date, category, amount, paid_by_member_id, description, receiptToSave, expId]
+      [date, category, amount, targetPayerId, description, receiptToSave, expId]
     );
 
     await logAction(
@@ -626,7 +648,7 @@ router.put('/expenses/:id', authenticateToken, requireAdmin, async (req, res) =>
   }
 });
 
-router.delete('/expenses/:id', authenticateToken, requireAdmin, async (req, res) => {
+router.delete('/expenses/:id', authenticateToken, async (req, res) => {
   const expId = req.params.id;
 
   try {
@@ -637,6 +659,12 @@ router.delete('/expenses/:id', authenticateToken, requireAdmin, async (req, res)
 
     if (existing.closed_month) {
       return res.status(400).json({ message: 'Cannot delete expenses from a closed month' });
+    }
+
+    const isAdmin = req.user.role === 'admin';
+    const isOwner = existing.paid_by_member_id === req.user.id || existing.created_by === req.user.id;
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({ message: 'Unauthorized transaction deletion' });
     }
 
     await queryRun('DELETE FROM expenses WHERE id = ?', [expId]);

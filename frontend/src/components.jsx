@@ -832,13 +832,20 @@ export function Dashboard({ data, user, transactions }) {
 }
 
 // ---------------- CONTRIBUTION MODULE ----------------
-export function Contributions({ data, onAdd, onEdit, onDelete, isAdmin }) {
+export function Contributions({ data, onAdd, onEdit, onDelete, isAdmin, currentUser }) {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [memberId, setMemberId] = useState('');
+  const [memberId, setMemberId] = useState(isAdmin ? '' : (currentUser?.id || ''));
   const [amount, setAmount] = useState('');
   const [method, setMethod] = useState('UPI');
   const [remarks, setRemarks] = useState('');
   const [editingId, setEditingId] = useState(null);
+
+  // Sync memberId when currentUser changes if not admin
+  React.useEffect(() => {
+    if (!isAdmin && currentUser && !editingId) {
+      setMemberId(currentUser.id);
+    }
+  }, [currentUser, isAdmin, editingId]);
 
   // Edit fields
   const handleEditInit = (c) => {
@@ -853,7 +860,7 @@ export function Contributions({ data, onAdd, onEdit, onDelete, isAdmin }) {
   const handleCancelEdit = () => {
     setEditingId(null);
     setDate(new Date().toISOString().split('T')[0]);
-    setMemberId('');
+    setMemberId(isAdmin ? '' : (currentUser?.id || ''));
     setAmount('');
     setMethod('UPI');
     setRemarks('');
@@ -879,7 +886,7 @@ export function Contributions({ data, onAdd, onEdit, onDelete, isAdmin }) {
     }
 
     // Reset
-    setMemberId('');
+    setMemberId(isAdmin ? '' : (currentUser?.id || ''));
     setAmount('');
     setRemarks('');
   };
@@ -909,10 +916,11 @@ export function Contributions({ data, onAdd, onEdit, onDelete, isAdmin }) {
               required
               value={memberId}
               onChange={(e) => setMemberId(e.target.value)}
-              className="w-full bg-slate-100 dark:bg-navy-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-500"
+              disabled={!isAdmin}
+              className="w-full bg-slate-100 dark:bg-navy-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-500 disabled:opacity-75 disabled:cursor-not-allowed"
             >
               <option value="">Select Roommate</option>
-              {data.members.map((m) => (
+              {data.members.filter(m => isAdmin || m.id === currentUser?.id).map((m) => (
                 <option key={m.id} value={m.id}>{m.name}</option>
               ))}
             </select>
@@ -977,10 +985,12 @@ export function Contributions({ data, onAdd, onEdit, onDelete, isAdmin }) {
         </form>
       </div>
 
-      {/* Contributions Logs Table */}
+      {/* Contributions Logs */}
       <div className="lg:col-span-2 glass-panel p-6 rounded-3xl shadow-premium dark:bg-navy-900/60">
         <h3 className="text-sm font-bold text-slate-800 dark:text-white mb-4">Contribution Logs</h3>
-        <div className="overflow-x-auto">
+        
+        {/* Desktop view: tabular table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
@@ -989,7 +999,7 @@ export function Contributions({ data, onAdd, onEdit, onDelete, isAdmin }) {
                 <th className="pb-3">Method</th>
                 <th className="pb-3">Remarks</th>
                 <th className="pb-3 text-right">Amount</th>
-                {isAdmin && <th className="pb-3 text-right">Actions</th>}
+                <th className="pb-3 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
@@ -1004,22 +1014,22 @@ export function Contributions({ data, onAdd, onEdit, onDelete, isAdmin }) {
                   </td>
                   <td className="py-3.5 text-slate-500 max-w-[120px] truncate">{c.remarks || '-'}</td>
                   <td className="py-3.5 text-right font-bold text-brand-600">{formatCurrency(c.amount)}</td>
-                  {isAdmin && (
-                    <td className="py-3.5 text-right">
-                      {c.closed_month ? (
-                        <span className="text-[10px] text-slate-400 italic">Closed ({c.closed_month})</span>
-                      ) : (
-                        <div className="flex justify-end gap-2">
-                          <button onClick={() => handleEditInit(c)} className="p-1 hover:text-brand-500 transition text-slate-400">
-                            <Edit2 className="w-4 h-4" />
-                          </button>
-                          <button onClick={() => onDelete(c.id)} className="p-1 hover:text-rose-500 transition text-slate-400">
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      )}
-                    </td>
-                  )}
+                  <td className="py-3.5 text-right">
+                    {c.closed_month ? (
+                      <span className="text-[10px] text-slate-400 italic">Closed ({c.closed_month})</span>
+                    ) : (isAdmin || c.member_id === currentUser?.id) ? (
+                      <div className="flex justify-end gap-2">
+                        <button onClick={() => handleEditInit(c)} className="p-1 hover:text-brand-500 transition text-slate-400">
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => onDelete(c.id)} className="p-1 hover:text-rose-500 transition text-slate-400">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-slate-300 dark:text-slate-700">-</span>
+                    )}
+                  </td>
                 </tr>
               ))}
               {data.contributionsList.length === 0 && (
@@ -1030,21 +1040,74 @@ export function Contributions({ data, onAdd, onEdit, onDelete, isAdmin }) {
             </tbody>
           </table>
         </div>
+
+        {/* Mobile view: card-based list */}
+        <div className="md:hidden space-y-3">
+          {data.contributionsList.map((c) => (
+            <div key={c.id} className="p-4 bg-slate-50 dark:bg-navy-950/40 border border-slate-200/50 dark:border-slate-800/50 rounded-2xl space-y-3">
+              <div className="flex justify-between items-start">
+                <div>
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase">{c.date}</span>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-white mt-0.5">{c.member_name}</h4>
+                  <span className="inline-block text-[9px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded-full mt-1.5">
+                    {c.payment_method}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="text-xs font-bold text-brand-600">{formatCurrency(c.amount)}</span>
+                  <p className="text-[11px] text-slate-500 mt-1 max-w-[150px] truncate">{c.remarks || '-'}</p>
+                </div>
+              </div>
+              <div className="flex justify-end items-center pt-2 border-t border-slate-200/40 dark:border-slate-800/40">
+                {c.closed_month ? (
+                  <span className="text-[10px] text-slate-400 italic bg-slate-200/50 dark:bg-slate-800/50 px-2 py-1 rounded-md">Closed ({c.closed_month})</span>
+                ) : (isAdmin || c.member_id === currentUser?.id) ? (
+                  <div className="flex gap-1">
+                    <button 
+                      onClick={() => handleEditInit(c)} 
+                      className="p-2 hover:bg-brand-500/10 hover:text-brand-500 rounded-xl transition text-slate-400"
+                    >
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+                    <button 
+                      onClick={() => onDelete(c.id)} 
+                      className="p-2 hover:bg-rose-500/10 hover:text-rose-500 rounded-xl transition text-slate-400"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <span className="text-[10px] text-slate-400 italic">Read-only</span>
+                )}
+              </div>
+            </div>
+          ))}
+          {data.contributionsList.length === 0 && (
+            <div className="py-8 text-center text-slate-400 text-xs">No contributions logged yet.</div>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
 // ---------------- EXPENSE MODULE ----------------
-export function Expenses({ data, onAdd, onEdit, onDelete, isAdmin }) {
+export function Expenses({ data, onAdd, onEdit, onDelete, isAdmin, currentUser }) {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [category, setCategory] = useState('Groceries');
   const [amount, setAmount] = useState('');
-  const [paidBy, setPaidBy] = useState('');
+  const [paidBy, setPaidBy] = useState(isAdmin ? '' : (currentUser?.id || ''));
   const [description, setDescription] = useState('');
   const [receiptBase64, setReceiptBase64] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [selectedReceipt, setSelectedReceipt] = useState(null); // Receipt viewer modal
+
+  // Sync paidBy when currentUser changes if not admin
+  React.useEffect(() => {
+    if (!isAdmin && currentUser && !editingId) {
+      setPaidBy(currentUser.id);
+    }
+  }, [currentUser, isAdmin, editingId]);
 
   // Image compressor + Base64 helper
   const handleFileChange = (e) => {
@@ -1099,7 +1162,7 @@ export function Expenses({ data, onAdd, onEdit, onDelete, isAdmin }) {
     setDate(new Date().toISOString().split('T')[0]);
     setCategory('Groceries');
     setAmount('');
-    setPaidBy('');
+    setPaidBy(isAdmin ? '' : (currentUser?.id || ''));
     setDescription('');
     setReceiptBase64(null);
   };
@@ -1125,7 +1188,7 @@ export function Expenses({ data, onAdd, onEdit, onDelete, isAdmin }) {
     }
 
     // Reset
-    setPaidBy('');
+    setPaidBy(isAdmin ? '' : (currentUser?.id || ''));
     setAmount('');
     setDescription('');
     setReceiptBase64(null);
@@ -1182,10 +1245,11 @@ export function Expenses({ data, onAdd, onEdit, onDelete, isAdmin }) {
               required
               value={paidBy}
               onChange={(e) => setPaidBy(e.target.value)}
-              className="w-full bg-slate-100 dark:bg-navy-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-500"
+              disabled={!isAdmin}
+              className="w-full bg-slate-100 dark:bg-navy-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-brand-500 disabled:opacity-75 disabled:cursor-not-allowed"
             >
               <option value="">Select Payer</option>
-              {data.members.map((m) => (
+              {data.members.filter(m => isAdmin || m.id === currentUser?.id).map((m) => (
                 <option key={m.id} value={m.id}>{m.name}</option>
               ))}
             </select>
@@ -1249,7 +1313,9 @@ export function Expenses({ data, onAdd, onEdit, onDelete, isAdmin }) {
       {/* Expenses logs list */}
       <div className="lg:col-span-2 glass-panel p-6 rounded-3xl shadow-premium dark:bg-navy-900/60">
         <h3 className="text-sm font-bold text-slate-800 dark:text-white mb-4">Expense Logs</h3>
-        <div className="overflow-x-auto">
+        
+        {/* Desktop view: tabular table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
@@ -1259,7 +1325,7 @@ export function Expenses({ data, onAdd, onEdit, onDelete, isAdmin }) {
                 <th className="pb-3">Description</th>
                 <th className="pb-3 text-center">Bill</th>
                 <th className="pb-3 text-right">Amount</th>
-                {isAdmin && <th className="pb-3 text-right">Actions</th>}
+                <th className="pb-3 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
@@ -1282,22 +1348,22 @@ export function Expenses({ data, onAdd, onEdit, onDelete, isAdmin }) {
                     )}
                   </td>
                   <td className="py-3.5 text-right font-bold text-slate-800 dark:text-white">{formatCurrency(e.amount)}</td>
-                  {isAdmin && (
-                    <td className="py-3.5 text-right">
-                      {e.closed_month ? (
-                        <span className="text-[10px] text-slate-400 italic">Closed ({e.closed_month})</span>
-                      ) : (
-                        <div className="flex justify-end gap-2">
-                          <button onClick={() => handleEditInit(e)} className="p-1 hover:text-brand-500 transition text-slate-400">
-                            <Edit2 className="w-4 h-4" />
-                          </button>
-                          <button onClick={() => onDelete(e.id)} className="p-1 hover:text-rose-500 transition text-slate-400">
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      )}
-                    </td>
-                  )}
+                  <td className="py-3.5 text-right">
+                    {e.closed_month ? (
+                      <span className="text-[10px] text-slate-400 italic">Closed ({e.closed_month})</span>
+                    ) : (isAdmin || e.paid_by_member_id === currentUser?.id) ? (
+                      <div className="flex justify-end gap-2">
+                        <button onClick={() => handleEditInit(e)} className="p-1 hover:text-brand-500 transition text-slate-400">
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => onDelete(e.id)} className="p-1 hover:text-rose-500 transition text-slate-400">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-slate-300 dark:text-slate-700">-</span>
+                    )}
+                  </td>
                 </tr>
               ))}
               {data.expensesList.length === 0 && (
@@ -1307,6 +1373,64 @@ export function Expenses({ data, onAdd, onEdit, onDelete, isAdmin }) {
               )}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile view: card-based list */}
+        <div className="md:hidden space-y-3">
+          {data.expensesList.map((e) => (
+            <div key={e.id} className="p-4 bg-slate-55 dark:bg-navy-950/40 border border-slate-200/50 dark:border-slate-800/50 rounded-2xl space-y-3">
+              <div className="flex justify-between items-start">
+                <div>
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase">{e.date}</span>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-white mt-0.5">{e.category}</h4>
+                  <p className="text-[11px] text-slate-500 mt-1">{e.description || 'No description'}</p>
+                </div>
+                <div className="text-right">
+                  <span className="text-xs font-bold text-slate-800 dark:text-white">{formatCurrency(e.amount)}</span>
+                  <div className="text-[10px] text-slate-400 font-medium mt-0.5">Paid by {e.member_name}</div>
+                </div>
+              </div>
+              <div className="flex justify-between items-center pt-2 border-t border-slate-200/40 dark:border-slate-800/40">
+                <div>
+                  {e.receipt_base64 ? (
+                    <button
+                      onClick={() => setSelectedReceipt(e.receipt_base64)}
+                      className="inline-flex items-center gap-1.5 text-[10px] font-bold text-brand-600 hover:text-brand-700 bg-brand-500/10 px-3 py-1.5 rounded-full transition"
+                    >
+                      <Eye className="w-3.5 h-3.5" /> View Receipt
+                    </button>
+                  ) : (
+                    <span className="text-[10px] text-slate-400 italic">No receipt</span>
+                  )}
+                </div>
+                <div>
+                  {e.closed_month ? (
+                    <span className="text-[10px] text-slate-400 italic bg-slate-200/50 dark:bg-slate-800/50 px-2 py-1 rounded-md">Closed ({e.closed_month})</span>
+                  ) : (isAdmin || e.paid_by_member_id === currentUser?.id) ? (
+                    <div className="flex gap-1">
+                      <button 
+                        onClick={() => handleEditInit(e)} 
+                        className="p-2 hover:bg-brand-500/10 hover:text-brand-500 rounded-xl transition text-slate-400"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button 
+                        onClick={() => onDelete(e.id)} 
+                        className="p-2 hover:bg-rose-500/10 hover:text-rose-500 rounded-xl transition text-slate-400"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <span className="text-[10px] text-slate-400 italic">Read-only</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+          {data.expensesList.length === 0 && (
+            <div className="py-8 text-center text-slate-400 text-xs">No expenses recorded yet.</div>
+          )}
         </div>
       </div>
 
@@ -1447,13 +1571,14 @@ export function Settlement({ data, config }) {
 }
 
 // ---------------- TRANSACTION HISTORY LIST ----------------
-export function History({ transactions, data, onDelete, isAdmin }) {
+export function History({ transactions, data, onDelete, isAdmin, currentUser }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [memberFilter, setMemberFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [selectedReceipt, setSelectedReceipt] = useState(null); // Receipt viewer modal
 
   // Filter logic
   const filteredList = useMemo(() => {
@@ -1563,7 +1688,8 @@ export function History({ transactions, data, onDelete, isAdmin }) {
           <span className="text-xs text-slate-400 font-semibold">{filteredList.length} matches</span>
         </div>
         
-        <div className="overflow-x-auto">
+        {/* Desktop view: tabular table */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
@@ -1572,8 +1698,9 @@ export function History({ transactions, data, onDelete, isAdmin }) {
                 <th className="pb-3">Member</th>
                 <th className="pb-3">Category</th>
                 <th className="pb-3">Description / Remarks</th>
+                <th className="pb-3 text-center">Bill</th>
                 <th className="pb-3 text-right">Amount</th>
-                {isAdmin && <th className="pb-3 text-right">Action</th>}
+                <th className="pb-3 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
@@ -1588,34 +1715,123 @@ export function History({ transactions, data, onDelete, isAdmin }) {
                   <td className="py-3.5 text-slate-800 dark:text-white font-semibold">{t.member_name}</td>
                   <td className="py-3.5 text-slate-700 dark:text-slate-300 font-medium">{t.category || '-'}</td>
                   <td className="py-3.5 text-slate-500 max-w-[200px] truncate">{t.description || '-'}</td>
+                  <td className="py-3.5 text-center">
+                    {t.receipt_base64 ? (
+                      <button
+                        onClick={() => setSelectedReceipt(t.receipt_base64)}
+                        className="inline-flex items-center gap-1 text-[10px] font-bold text-brand-600 hover:text-brand-700 bg-brand-500/10 px-2 py-1 rounded-full transition"
+                      >
+                        <Eye className="w-3 h-3" /> View
+                      </button>
+                    ) : (
+                      <span className="text-slate-300 dark:text-slate-700">-</span>
+                    )}
+                  </td>
                   <td className={`py-3.5 text-right font-bold ${t.type === 'contribution' ? 'text-brand-600' : 'text-slate-800 dark:text-white'}`}>
                     {t.type === 'contribution' ? '+' : '-'}{formatCurrency(t.amount)}
                   </td>
-                  {isAdmin && (
-                    <td className="py-3.5 text-right">
-                      {t.closed_month ? (
-                        <span className="text-[10px] text-slate-400 italic">Closed ({t.closed_month})</span>
-                      ) : (
-                        <button
-                          onClick={() => onDelete(t.id, t.type)}
-                          className="p-1 hover:text-rose-500 transition text-slate-400"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      )}
-                    </td>
-                  )}
+                  <td className="py-3.5 text-right">
+                    {t.closed_month ? (
+                      <span className="text-[10px] text-slate-400 italic">Closed ({t.closed_month})</span>
+                    ) : (isAdmin || t.member_id === currentUser?.id) ? (
+                      <button
+                        onClick={() => onDelete(t.id, t.type)}
+                        className="p-1 hover:text-rose-500 transition text-slate-400"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    ) : (
+                      <span className="text-slate-300 dark:text-slate-700">-</span>
+                    )}
+                  </td>
                 </tr>
               ))}
               {filteredList.length === 0 && (
                 <tr>
-                  <td colSpan="7" className="py-8 text-center text-slate-400">No matching transactions found.</td>
+                  <td colSpan="8" className="py-8 text-center text-slate-400">No matching transactions found.</td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
+
+        {/* Mobile view: card-based list */}
+        <div className="md:hidden space-y-3">
+          {filteredList.map((t) => (
+            <div key={`${t.type}-${t.id}`} className="p-4 bg-slate-50 dark:bg-navy-950/40 border border-slate-200/50 dark:border-slate-800/50 rounded-2xl space-y-3">
+              <div className="flex justify-between items-start">
+                <div>
+                  <span className="text-[10px] text-slate-400 font-semibold uppercase">{t.date}</span>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <h4 className="text-xs font-bold text-slate-800 dark:text-white">{t.member_name}</h4>
+                    <span className={`inline-block text-[9px] font-bold rounded-full px-2 py-0.5 ${t.type === 'contribution' ? 'bg-brand-500/10 text-brand-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'}`}>
+                      {t.type}
+                    </span>
+                  </div>
+                  {t.category && <span className="text-[10px] text-slate-400 mt-1 block">Category: {t.category}</span>}
+                  <p className="text-[11px] text-slate-500 mt-1">{t.description || '-'}</p>
+                </div>
+                <div className="text-right">
+                  <span className={`text-xs font-bold ${t.type === 'contribution' ? 'text-brand-600' : 'text-slate-800 dark:text-white'}`}>
+                    {t.type === 'contribution' ? '+' : '-'}{formatCurrency(t.amount)}
+                  </span>
+                </div>
+              </div>
+              <div className="flex justify-between items-center pt-2 border-t border-slate-200/40 dark:border-slate-800/40">
+                <div>
+                  {t.receipt_base64 ? (
+                    <button
+                      onClick={() => setSelectedReceipt(t.receipt_base64)}
+                      className="inline-flex items-center gap-1.5 text-[10px] font-bold text-brand-600 hover:text-brand-700 bg-brand-500/10 px-3 py-1.5 rounded-full transition"
+                    >
+                      <Eye className="w-3.5 h-3.5" /> View Receipt
+                    </button>
+                  ) : (
+                    <span className="text-[10px] text-slate-400 italic">No receipt</span>
+                  )}
+                </div>
+                <div>
+                  {t.closed_month ? (
+                    <span className="text-[10px] text-slate-400 italic bg-slate-200/50 dark:bg-slate-800/50 px-2 py-1 rounded-md">Closed ({t.closed_month})</span>
+                  ) : (isAdmin || t.member_id === currentUser?.id) ? (
+                    <button
+                      onClick={() => onDelete(t.id, t.type)}
+                      className="p-2 hover:bg-rose-500/10 hover:text-rose-500 rounded-xl transition text-slate-400"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  ) : (
+                    <span className="text-[10px] text-slate-400 italic">Read-only</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+          {filteredList.length === 0 && (
+            <div className="py-8 text-center text-slate-400 text-xs">No matching transactions found.</div>
+          )}
+        </div>
       </div>
+
+      {/* Bill Receipt Preview Modal */}
+      {selectedReceipt && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 max-w-md w-full p-5 rounded-3xl shadow-2xl relative">
+            <h4 className="text-sm font-bold text-white mb-4 flex items-center gap-2">
+              <ImageIcon className="w-5 h-5 text-brand-500" /> Bill Receipt Attachment
+            </h4>
+            <div className="w-full aspect-square border border-slate-800 bg-slate-950 rounded-2xl overflow-hidden flex items-center justify-center">
+              <img src={selectedReceipt} className="max-w-full max-h-full object-contain" alt="Receipt Upload" />
+            </div>
+            <button
+              onClick={() => setSelectedReceipt(null)}
+              className="mt-4 w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl transition text-xs"
+            >
+              Close Viewer
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
