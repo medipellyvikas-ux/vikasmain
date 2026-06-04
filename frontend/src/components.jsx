@@ -1152,7 +1152,7 @@ export function Expenses({ data, onAdd, onEdit, onDelete, isAdmin, currentUser }
     setDate(e.date);
     setCategory(e.category);
     setAmount(e.amount);
-    setPaidBy(e.paid_by_member_id);
+    setPaidBy(e.member_id);
     setDescription(e.description || '');
     setReceiptBase64(e.receipt_base64 || null);
   };
@@ -1351,7 +1351,7 @@ export function Expenses({ data, onAdd, onEdit, onDelete, isAdmin, currentUser }
                   <td className="py-3.5 text-right">
                     {e.closed_month ? (
                       <span className="text-[10px] text-slate-400 italic">Closed ({e.closed_month})</span>
-                    ) : (isAdmin || e.paid_by_member_id === currentUser?.id) ? (
+                    ) : (isAdmin || e.member_id === currentUser?.id) ? (
                       <div className="flex justify-end gap-2">
                         <button onClick={() => handleEditInit(e)} className="p-1 hover:text-brand-500 transition text-slate-400">
                           <Edit2 className="w-4 h-4" />
@@ -1406,7 +1406,7 @@ export function Expenses({ data, onAdd, onEdit, onDelete, isAdmin, currentUser }
                 <div>
                   {e.closed_month ? (
                     <span className="text-[10px] text-slate-400 italic bg-slate-200/50 dark:bg-slate-800/50 px-2 py-1 rounded-md">Closed ({e.closed_month})</span>
-                  ) : (isAdmin || e.paid_by_member_id === currentUser?.id) ? (
+                  ) : (isAdmin || e.member_id === currentUser?.id) ? (
                     <div className="flex gap-1">
                       <button 
                         onClick={() => handleEditInit(e)} 

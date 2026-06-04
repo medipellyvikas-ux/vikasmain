@@ -267,7 +267,7 @@ router.post('/members/:id/reset-password', authenticateToken, requireAdmin, asyn
 // ---------------- SETTLEMENT LOGIC HELPERS ----------------
 
 export async function calculateSettlementsInternal() {
-  const members = await queryAll("SELECT id, name, mobile, username, role, status FROM members WHERE status = 'active'");
+  const members = await queryAll("SELECT id, name, mobile, username, role, status FROM members WHERE status = 'active' AND role != 'admin'");
   
   const contributions = await queryAll(`
     SELECT c.*, m.name as member_name 
