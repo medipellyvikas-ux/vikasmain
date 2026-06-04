@@ -497,7 +497,7 @@ export function Dashboard({ data, user, transactions }) {
       .filter(t => t && t.type === 'expense' && !t.closed_month)
       .forEach(t => {
         const amt = Number(t.amount);
-        if (!isNaN(amt)) {
+        if (!isNaN(amt) && amt > 0) {
           categoryTotals[t.category] = (categoryTotals[t.category] || 0) + amt;
         }
       });
@@ -528,7 +528,7 @@ export function Dashboard({ data, user, transactions }) {
       .forEach(t => {
         const month = t.date.substring(0, 7); // YYYY-MM
         const amt = Number(t.amount);
-        if (month && !isNaN(amt)) {
+        if (month && !isNaN(amt) && amt > 0) {
           monthlyGroups[month] = (monthlyGroups[month] || 0) + amt;
         }
       });
@@ -540,6 +540,16 @@ export function Dashboard({ data, user, transactions }) {
         amount: monthlyGroups[month]
       }));
   }, [transactions]);
+
+  const maxContribution = useMemo(() => {
+    if (memberContributionsData.length === 0) return 0;
+    return Math.max(...memberContributionsData.map(d => d.contributed || 0), 0);
+  }, [memberContributionsData]);
+
+  const maxTrendAmount = useMemo(() => {
+    if (monthlyTrendData.length === 0) return 0;
+    return Math.max(...monthlyTrendData.map(d => d.amount || 0), 0);
+  }, [monthlyTrendData]);
 
   // Alert flags
   const largeExpenses = useMemo(() => {
@@ -697,7 +707,7 @@ export function Dashboard({ data, user, transactions }) {
                 <BarChart data={memberContributionsData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                   <XAxis dataKey="name" stroke="#94a3b8" fontSize={10} tickLine={false} />
-                  <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} width={30} domain={[0, dataMax => (typeof dataMax === 'number' && !isNaN(dataMax) && dataMax > 0) ? 'auto' : 1000]} />
+                  <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} width={30} domain={[0, maxContribution > 0 ? 'auto' : 1000]} />
                   <Tooltip formatter={(value) => formatCurrency(value)} cursor={{ fill: 'transparent' }} />
                   <Bar dataKey="contributed" fill="#10b981" radius={[8, 8, 0, 0]} maxBarSize={35}>
                     {memberContributionsData.map((entry, index) => (
@@ -730,7 +740,7 @@ export function Dashboard({ data, user, transactions }) {
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                   <XAxis dataKey="month" stroke="#94a3b8" fontSize={10} tickLine={false} />
-                  <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} width={30} />
+                  <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} width={30} domain={[0, maxTrendAmount > 0 ? 'auto' : 1000]} />
                   <Tooltip formatter={(value) => formatCurrency(value)} />
                   <Area type="monotone" dataKey="amount" stroke="#8b5cf6" strokeWidth={2} fillOpacity={1} fill="url(#colorAmount)" />
                 </AreaChart>
