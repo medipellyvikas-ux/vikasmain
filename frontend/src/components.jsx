@@ -314,19 +314,19 @@ export function Login({ onLogin }) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brand-950/40 via-slate-950 to-navy-950 p-6 transition-all duration-300">
       
-      {/* Upper Logo / Branding (SpendLens theme) */}
+      {/* Upper Logo / Branding (Bachelors Room theme) */}
       <div className="text-center mb-10 select-none max-w-xl">
         <div className="relative mx-auto w-24 h-24 mb-4 flex items-center justify-center">
-          {/* Custom vector SpendLens magnifying glass logo */}
+          {/* Custom vector Bachelors Room home logo */}
           <svg className="w-16 h-16 text-cyan-400 drop-shadow-[0_0_15px_rgba(6,182,212,0.3)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.3-4.3" />
-            <path d="M11 8v6M8 11h6" className="stroke-brand-500" strokeWidth="2.5" />
+            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            <polyline points="9 22 9 12 15 12 15 22" />
+            <circle cx="12" cy="7" r="1.5" className="stroke-brand-500 fill-brand-500" />
           </svg>
         </div>
         
         <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-brand-400 via-cyan-400 to-indigo-400 bg-clip-text text-transparent">
-          SpendLens
+          Bachelors Room
         </h1>
         <p className="text-slate-400/90 text-sm mt-2 font-medium tracking-wide">
           Collaborative expense intelligence for your household
@@ -479,7 +479,7 @@ export function Login({ onLogin }) {
       </div>
 
       <div className="mt-8 text-center text-[10px] text-slate-600 font-semibold uppercase tracking-wider">
-        <span>SpendLens Room Intel v1.2 • Production Build</span>
+          <span>Bachelors Room Intel v1.2 • Production Build</span>
       </div>
     </div>
   );

@@ -27,6 +27,7 @@ export default function App() {
     transactionCount: 0
   });
   const [transactions, setTransactions] = useState([]);
+  const [members, setMembers] = useState([]);
   const [auditLogs, setAuditLogs] = useState([]);
   
   // App settings/configs
@@ -63,7 +64,12 @@ export default function App() {
       const txs = await resTx.json();
       setTransactions(txs);
 
-      // 3. Fetch audit logs (only if admin)
+      // 3. Fetch all members
+      const resMembers = await fetch('/api/members', { headers });
+      const membersData = await resMembers.json();
+      setMembers(membersData);
+
+      // 4. Fetch audit logs (only if admin)
       if (user?.role === 'admin') {
         const resLogs = await fetch('/api/audit-logs', { headers });
         const logs = await resLogs.json();
@@ -266,7 +272,7 @@ export default function App() {
             <DollarSign className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="font-bold text-sm text-white tracking-tight">SpendLens</h1>
+            <h1 className="font-bold text-sm text-white tracking-tight">Bachelors Room</h1>
             <span className="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">{user.role} workspace</span>
           </div>
         </div>
@@ -329,7 +335,7 @@ export default function App() {
             <div className="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center">
               <DollarSign className="w-4.5 h-4.5 text-white" />
             </div>
-            <h1 className="font-bold text-sm tracking-tight">SpendLens</h1>
+            <h1 className="font-bold text-sm tracking-tight">Bachelors Room</h1>
           </div>
           
           <div className="flex items-center gap-3">
@@ -462,7 +468,7 @@ export default function App() {
             )}
             {activeTab === 'members' && (
               <Members 
-                data={report} 
+                data={{ members }} 
                 onAdd={addMember}
                 onUpdate={updateMember}
                 onResetPassword={resetMemberPassword}
