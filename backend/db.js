@@ -201,6 +201,20 @@ export const initDatabase = async () => {
     // In PostgreSQL count returns a string, so we parse it
     const count = parseInt(membersCount?.count || membersCount?.COUNT || 0);
 
+    // Auto-migrate old roommate names to new SpendLens roommate names if they exist
+    if (count > 0) {
+      const m1 = await queryGet("SELECT * FROM members WHERE username = 'member1'");
+      if (m1 && m1.name === 'Vikas') {
+        console.log('Migrating default members to SpendLens names...');
+        await queryRun("UPDATE members SET name = 'Akhil' WHERE username = 'member1'");
+        await queryRun("UPDATE members SET name = 'Vikas' WHERE username = 'member2'");
+        await queryRun("UPDATE members SET name = 'Jithu' WHERE username = 'member3'");
+        await queryRun("UPDATE members SET name = 'Bhanu' WHERE username = 'member4'");
+        await queryRun("UPDATE members SET name = 'Jagan' WHERE username = 'member5'");
+        console.log('Migration completed.');
+      }
+    }
+
     if (count === 0) {
       console.log('Seeding default members into the database...');
       const adminPasswordHash = bcrypt.hashSync('admin123', 10);

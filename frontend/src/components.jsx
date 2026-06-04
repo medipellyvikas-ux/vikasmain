@@ -3,7 +3,7 @@ import {
   DollarSign, ArrowUpRight, ArrowDownRight, Users, Plus, Trash2, Edit2, 
   Download, Moon, Sun, LogOut, Shield, User, Key, Search, Filter, 
   AlertTriangle, CheckCircle, FileText, QrCode, ClipboardList, Database,
-  ArrowRight, CreditCard, Image as ImageIcon, Sparkles, RefreshCw, Upload, Eye
+  ArrowRight, ChevronDown, CreditCard, Image as ImageIcon, Sparkles, RefreshCw, Upload, Eye
 } from 'lucide-react';
 import { 
   ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend,
@@ -32,6 +32,187 @@ const formatCurrency = (val) => {
     currency: 'INR',
     maximumFractionDigits: 0
   }).format(val);
+};
+
+// --- ILLUSTRATED ROOMMATE AVATARS (SpendLens Style) ---
+const AkhilAvatar = () => (
+  <svg viewBox="0 0 100 100" className="w-full h-full">
+    <defs>
+      <linearGradient id="akhilGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#111827" />
+        <stop offset="100%" stopColor="#1e293b" />
+      </linearGradient>
+    </defs>
+    <circle cx="50" cy="50" r="48" fill="url(#akhilGrad)" />
+    <path d="M 25,95 Q 50,75 75,95 Z" fill="#064e3b" />
+    <path d="M 44,70 L 44,80 Q 50,85 56,80 L 56,70 Z" fill="#8c5a3c" />
+    <circle cx="50" cy="52" r="22" fill="#9c6644" />
+    <circle cx="27" cy="52" r="5" fill="#8c5a3c" />
+    <circle cx="73" cy="52" r="5" fill="#8c5a3c" />
+    <ellipse cx="42" cy="50" rx="4" ry="5" fill="#0f172a" />
+    <ellipse cx="58" cy="50" rx="4" ry="5" fill="#0f172a" />
+    <circle cx="40.5" cy="48.5" r="1.2" fill="#ffffff" />
+    <circle cx="56.5" cy="48.5" r="1.2" fill="#ffffff" />
+    <path d="M 36,43 Q 42,41 46,44" stroke="#0f172a" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+    <path d="M 64,43 Q 58,41 54,44" stroke="#0f172a" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+    <path d="M 50,51 L 49,56 Q 50,58 52,57" stroke="#78482c" strokeWidth="2" strokeLinecap="round" fill="none" />
+    <path d="M 44,63 Q 50,67 56,63" stroke="#5c3820" strokeWidth="3" strokeLinecap="round" fill="none" />
+    <path d="M 26,52 C 24,35 34,22 50,22 C 66,22 76,35 74,52 L 72,68 C 70,62 68,55 68,52 C 68,36 50,30 50,30 C 50,30 32,36 32,52 C 32,55 30,62 28,68 Z" fill="#cbd5e1" />
+    <path d="M 28,45 C 32,30 42,26 50,32 C 58,26 68,30 72,45 C 68,38 60,35 55,38 C 52,40 50,44 48,42 C 44,38 36,36 28,45 Z" fill="#cbd5e1" />
+    <path d="M 45,30 Q 32,48 33,58 L 29,54 Q 28,44 45,30 Z" fill="#e2e8f0" />
+    <path d="M 55,30 Q 68,48 67,58 L 71,54 Q 72,44 55,30 Z" fill="#e2e8f0" />
+  </svg>
+);
+
+const VikasAvatar = () => (
+  <svg viewBox="0 0 100 100" className="w-full h-full">
+    <defs>
+      <linearGradient id="vikasGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#111827" />
+        <stop offset="100%" stopColor="#1e293b" />
+      </linearGradient>
+    </defs>
+    <circle cx="50" cy="50" r="48" fill="url(#vikasGrad)" />
+    <path d="M 25,95 Q 50,75 75,95 Z" fill="#581c87" />
+    <path d="M 44,70 L 44,80 Q 50,85 56,80 L 56,70 Z" fill="#78482c" />
+    <circle cx="50" cy="52" r="22" fill="#8c5a3c" />
+    <circle cx="27" cy="52" r="5" fill="#78482c" />
+    <circle cx="73" cy="52" r="5" fill="#78482c" />
+    <circle cx="34" cy="34" r="8" fill="#1e1b4b" />
+    <circle cx="44" cy="28" r="9" fill="#1e1b4b" />
+    <circle cx="56" cy="28" r="9" fill="#1e1b4b" />
+    <circle cx="66" cy="34" r="8" fill="#1e1b4b" />
+    <circle cx="72" cy="44" r="7.5" fill="#1e1b4b" />
+    <circle cx="28" cy="44" r="7.5" fill="#1e1b4b" />
+    <circle cx="50" cy="32" r="10" fill="#1e1b4b" />
+    <circle cx="38" cy="40" r="8" fill="#1e1b4b" />
+    <circle cx="62" cy="40" r="8" fill="#1e1b4b" />
+    <ellipse cx="41" cy="51" rx="3.5" ry="4" fill="#0f172a" />
+    <ellipse cx="59" cy="51" rx="3.5" ry="4" fill="#0f172a" />
+    <circle cx="39.8" cy="49.8" r="1" fill="#ffffff" />
+    <circle cx="57.8" cy="49.8" r="1" fill="#ffffff" />
+    <circle cx="41" cy="51" r="9" stroke="#000000" strokeWidth="2.5" fill="none" />
+    <circle cx="59" cy="51" r="9" stroke="#000000" strokeWidth="2.5" fill="none" />
+    <line x1="48" y1="51" x2="52" y2="51" stroke="#000000" strokeWidth="3" />
+    <path d="M 32,51 L 28,50" stroke="#000000" strokeWidth="2" />
+    <path d="M 68,51 L 72,50" stroke="#000000" strokeWidth="2" />
+    <path d="M 50,52 L 49,56 Q 50,57 51,56" stroke="#5c3820" strokeWidth="2" strokeLinecap="round" fill="none" />
+    <path d="M 44,64 Q 50,69 56,64" stroke="#5c3820" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+  </svg>
+);
+
+const JithuAvatar = () => (
+  <svg viewBox="0 0 100 100" className="w-full h-full">
+    <defs>
+      <linearGradient id="jithuGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#111827" />
+        <stop offset="100%" stopColor="#1e293b" />
+      </linearGradient>
+    </defs>
+    <circle cx="50" cy="50" r="48" fill="url(#jithuGrad)" />
+    <path d="M 25,95 Q 50,75 75,95 Z" fill="#78350f" />
+    <path d="M 44,70 L 44,80 Q 50,85 56,80 L 56,70 Z" fill="#7c5234" />
+    <circle cx="50" cy="51" r="23" fill="#905f3c" />
+    <circle cx="26" cy="51" r="5.5" fill="#7c5234" />
+    <circle cx="74" cy="51" r="5.5" fill="#7c5234" />
+    <circle cx="40" cy="49" r="6.5" fill="#ffffff" />
+    <circle cx="60" cy="49" r="6.5" fill="#ffffff" />
+    <circle cx="41" cy="49" r="3.5" fill="#1e293b" />
+    <circle cx="59" cy="49" r="3.5" fill="#1e293b" />
+    <circle cx="39.5" cy="47.5" r="1.2" fill="#ffffff" />
+    <circle cx="57.5" cy="47.5" r="1.2" fill="#ffffff" />
+    <path d="M 32,41 Q 40,38 46,42" stroke="#5c3e29" strokeWidth="2" strokeLinecap="round" fill="none" />
+    <path d="M 68,41 Q 60,38 54,42" stroke="#5c3e29" strokeWidth="2" strokeLinecap="round" fill="none" />
+    <path d="M 50,49 L 49,55 Q 50,57 52,56" stroke="#724629" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+    <path d="M 44,63 Q 50,67 56,63" stroke="#1e293b" strokeWidth="2" strokeLinecap="round" fill="none" />
+  </svg>
+);
+
+const BhanuAvatar = () => (
+  <svg viewBox="0 0 100 100" className="w-full h-full">
+    <defs>
+      <linearGradient id="bhanuGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#111827" />
+        <stop offset="100%" stopColor="#1e293b" />
+      </linearGradient>
+    </defs>
+    <circle cx="50" cy="50" r="48" fill="url(#bhanuGrad)" />
+    <path d="M 25,95 Q 50,75 75,95 Z" fill="#991b1b" />
+    <path d="M 44,70 L 44,80 Q 50,85 56,80 L 56,70 Z" fill="#e0a080" />
+    <circle cx="50" cy="52" r="22" fill="#f5b895" />
+    <circle cx="27" cy="52" r="5" fill="#e0a080" />
+    <circle cx="73" cy="52" r="5" fill="#e0a080" />
+    <path d="M 27,45 C 24,30 35,18 50,18 C 65,18 76,30 73,45 L 72,55 Q 68,44 64,40 C 60,42 56,44 50,40 Q 46,45 42,42 C 38,44 34,44 28,55 Z" fill="#c2410c" />
+    <path d="M 33,26 L 24,24 L 32,32 Z" fill="#c2410c" />
+    <path d="M 45,20 L 42,10 L 50,16 Z" fill="#c2410c" />
+    <path d="M 58,20 L 62,10 L 63,18 Z" fill="#c2410c" />
+    <path d="M 68,26 L 76,22 L 70,33 Z" fill="#c2410c" />
+    <ellipse cx="42" cy="51" rx="3.5" ry="4" fill="#0f172a" />
+    <ellipse cx="58" cy="51" rx="3.5" ry="4" fill="#0f172a" />
+    <rect x="32" y="43" width="16" height="14" rx="3" stroke="#991b1b" strokeWidth="2.5" fill="none" />
+    <rect x="52" y="43" width="16" height="14" rx="3" stroke="#991b1b" strokeWidth="2.5" fill="none" />
+    <line x1="48" y1="50" x2="52" y2="50" stroke="#991b1b" strokeWidth="3" />
+    <line x1="32" y1="50" x2="28" y2="50" stroke="#991b1b" strokeWidth="2" />
+    <line x1="68" y1="50" x2="72" y2="50" stroke="#991b1b" strokeWidth="2" />
+    <path d="M 50,52 L 49,56 Q 50,57 51,56" stroke="#c08060" strokeWidth="2" strokeLinecap="round" fill="none" />
+    <path d="M 43,62 Q 50,72 57,62 Z" fill="#7f1d1d" />
+    <path d="M 45,63 Q 50,67 55,63" fill="#ffffff" />
+  </svg>
+);
+
+const JaganAvatar = () => (
+  <svg viewBox="0 0 100 100" className="w-full h-full">
+    <defs>
+      <linearGradient id="jaganGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#111827" />
+        <stop offset="100%" stopColor="#1e293b" />
+      </linearGradient>
+    </defs>
+    <circle cx="50" cy="50" r="48" fill="url(#jaganGrad)" />
+    <path d="M 25,95 Q 50,75 75,95 Z" fill="#0369a1" />
+    <path d="M 44,70 L 44,80 Q 50,85 56,80 L 56,70 Z" fill="#8c5a3c" />
+    <circle cx="50" cy="52" r="22" fill="#9e6644" />
+    <circle cx="27" cy="52" r="5" fill="#8c5a3c" />
+    <circle cx="73" cy="52" r="5" fill="#8c5a3c" />
+    <path d="M 26,45 C 24,30 35,20 50,20 C 65,20 76,30 74,45 C 70,40 68,36 62,38 C 58,34 54,34 50,38 C 46,34 42,34 38,38 C 32,36 30,40 26,45 Z" fill="#172554" />
+    <path d="M 30,30 L 20,22 L 28,38 Z" fill="#172554" />
+    <path d="M 42,22 L 35,10 L 45,18 Z" fill="#172554" />
+    <path d="M 58,22 L 65,10 L 55,18 Z" fill="#172554" />
+    <path d="M 70,30 L 80,22 L 72,38 Z" fill="#172554" />
+    <path d="M 50,22 L 50,8 L 54,18 Z" fill="#172554" />
+    <path d="M 37,52 L 45,49 L 44,53 Z" fill="#0f172a" />
+    <path d="M 63,52 L 55,49 L 56,53 Z" fill="#0f172a" />
+    <path d="M 34,45 L 45,42" stroke="#0f172a" strokeWidth="3" strokeLinecap="round" fill="none" />
+    <path d="M 66,45 L 55,42" stroke="#0f172a" strokeWidth="3" strokeLinecap="round" fill="none" />
+    <path d="M 50,52 L 49,56 Q 50,57 51,56" stroke="#7c4c30" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+    <path d="M 45,64 Q 53,60 55,65" stroke="#5c3820" strokeWidth="3" strokeLinecap="round" fill="none" />
+  </svg>
+);
+
+export function RoommateAvatar({ name }) {
+  const cleanName = name ? name.trim().toLowerCase() : '';
+  if (cleanName === 'akhil') return <AkhilAvatar />;
+  if (cleanName === 'vikas') return <VikasAvatar />;
+  if (cleanName === 'jithu') return <JithuAvatar />;
+  if (cleanName === 'bhanu') return <BhanuAvatar />;
+  if (cleanName === 'jagan') return <JaganAvatar />;
+  
+  const initials = name ? name.trim().substring(0, 2).toUpperCase() : '??';
+  return (
+    <div className="w-full h-full bg-slate-950 flex items-center justify-center font-bold text-lg text-slate-400 tracking-wide rounded-full">
+      {initials}
+    </div>
+  );
+}
+
+export const getRoommateColor = (name) => {
+  const cleanName = name ? name.trim().toLowerCase() : '';
+  if (cleanName === 'akhil') return '#10b981'; // emerald green
+  if (cleanName === 'vikas') return '#8b5cf6'; // purple
+  if (cleanName === 'jithu') return '#f59e0b'; // amber/yellow
+  if (cleanName === 'bhanu') return '#f43f5e'; // rose/red
+  if (cleanName === 'jagan') return '#06b6d4'; // cyan/blue
+  return '#64748b'; // slate fallback
 };
 
 // ---------------- LOGIN COMPONENT ----------------
@@ -103,9 +284,26 @@ export function Login({ onLogin }) {
 
   // Color mappings matching SpendLens illustrated circles
   const getAvatarStyle = (index, name) => {
+    const cleanName = name ? name.trim().toLowerCase() : '';
+    if (cleanName === 'akhil') {
+      return { border: 'border-emerald-500/80 hover:border-emerald-400', text: 'text-emerald-500', shadow: 'shadow-emerald-500/10', ring: 'ring-emerald-500/20' };
+    }
+    if (cleanName === 'vikas') {
+      return { border: 'border-purple-500/80 hover:border-purple-400', text: 'text-purple-500', shadow: 'shadow-purple-500/10', ring: 'ring-purple-500/20' };
+    }
+    if (cleanName === 'jithu') {
+      return { border: 'border-amber-500/80 hover:border-amber-400', text: 'text-amber-500', shadow: 'shadow-amber-500/10', ring: 'ring-amber-500/20' };
+    }
+    if (cleanName === 'bhanu') {
+      return { border: 'border-rose-500/80 hover:border-rose-400', text: 'text-rose-500', shadow: 'shadow-rose-500/10', ring: 'ring-rose-500/20' };
+    }
+    if (cleanName === 'jagan') {
+      return { border: 'border-cyan-500/80 hover:border-cyan-400', text: 'text-cyan-500', shadow: 'shadow-cyan-500/10', ring: 'ring-cyan-500/20' };
+    }
+
     const styles = [
       { border: 'border-emerald-500/80 hover:border-emerald-400', text: 'text-emerald-500', shadow: 'shadow-emerald-500/10', ring: 'ring-emerald-500/20' },
-      { border: 'border-indigo-500/80 hover:border-indigo-400', text: 'text-indigo-500', shadow: 'shadow-indigo-500/10', ring: 'ring-indigo-500/20' },
+      { border: 'border-purple-500/80 hover:border-purple-400', text: 'text-purple-500', shadow: 'shadow-purple-500/10', ring: 'ring-purple-500/20' },
       { border: 'border-amber-500/80 hover:border-amber-400', text: 'text-amber-500', shadow: 'shadow-amber-500/10', ring: 'ring-amber-500/20' },
       { border: 'border-rose-500/80 hover:border-rose-400', text: 'text-rose-500', shadow: 'shadow-rose-500/10', ring: 'ring-rose-500/20' },
       { border: 'border-cyan-500/80 hover:border-cyan-400', text: 'text-cyan-500', shadow: 'shadow-cyan-500/10', ring: 'ring-cyan-500/20' }
@@ -173,19 +371,16 @@ export function Login({ onLogin }) {
             <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8">
               {members.map((m, idx) => {
                 const colors = getAvatarStyle(idx, m.name);
-                const initials = m.name.substring(0, 2);
                 
                 return (
                   <button
                     key={m.id}
                     onClick={() => { setSelectedMember(m); setError(''); setPassword(''); }}
-                    className="flex flex-col items-center gap-3 group focus:outline-none"
+                    className="flex flex-col items-center bg-slate-900/50 hover:bg-slate-900/85 border border-slate-800/80 hover:border-slate-700/80 p-5 rounded-3xl w-36 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-slate-700 gap-3.5 group"
                   >
                     {/* Illustrated Circular Avatar container */}
-                    <div className={`w-20 h-20 rounded-full border-[3px] ${colors.border} ${colors.shadow} shadow-lg flex items-center justify-center transition-all duration-300 transform group-hover:scale-105 group-active:scale-95 group-hover:ring-8 ${colors.ring}`}>
-                      <div className={`w-[90%] h-[90%] rounded-full bg-slate-950 flex items-center justify-center font-bold text-lg ${colors.text} tracking-wide`}>
-                        {initials}
-                      </div>
+                    <div className={`w-20 h-20 rounded-full border-[3px] ${colors.border} ${colors.shadow} shadow-lg flex items-center justify-center transition-all duration-300 transform group-hover:scale-105 group-hover:ring-8 ${colors.ring} overflow-hidden`}>
+                      <RoommateAvatar name={m.name} />
                     </div>
 
                     {/* Roommate Name label */}
@@ -194,7 +389,7 @@ export function Login({ onLogin }) {
                     </span>
 
                     {/* Caret caret */}
-                    <ArrowRight className={`w-4 h-4 ${colors.text} opacity-70 group-hover:opacity-100 transform group-hover:translate-x-1 transition duration-200`} />
+                    <ChevronDown className={`w-4 h-4 ${colors.text} opacity-70 group-hover:opacity-100 transform group-hover:translate-y-1 transition duration-200`} />
                   </button>
                 );
               })}
@@ -449,7 +644,7 @@ export function Dashboard({ data, user, transactions }) {
               <span>No active expenses recorded</span>
             </div>
           ) : (
-            <div className="flex-1 w-full min-h-[220px]">
+            <div className="h-[220px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -483,7 +678,7 @@ export function Dashboard({ data, user, transactions }) {
         {/* Member contribution comparison */}
         <div className="lg:col-span-1 glass-panel p-6 rounded-3xl shadow-premium dark:bg-navy-900/60 min-h-[350px] flex flex-col">
           <h3 className="text-sm font-bold text-slate-800 dark:text-white mb-3">Member Contributions</h3>
-          <div className="flex-1 w-full min-h-[220px]">
+          <div className="h-[220px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={memberContributionsData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
@@ -492,7 +687,7 @@ export function Dashboard({ data, user, transactions }) {
                 <Tooltip formatter={(value) => formatCurrency(value)} cursor={{ fill: 'transparent' }} />
                 <Bar dataKey="contributed" fill="#10b981" radius={[8, 8, 0, 0]} maxBarSize={35}>
                   {memberContributionsData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell key={`cell-${index}`} fill={getRoommateColor(entry.name)} />
                   ))}
                 </Bar>
               </BarChart>
@@ -509,7 +704,7 @@ export function Dashboard({ data, user, transactions }) {
               <span>No historical data</span>
             </div>
           ) : (
-            <div className="flex-1 w-full min-h-[220px]">
+            <div className="h-[220px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={monthlyTrendData}>
                   <defs>

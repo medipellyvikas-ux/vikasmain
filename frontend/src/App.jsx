@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { 
   Login, Dashboard, Contributions, Expenses, 
-  Settlement, History, Reports, Members, AuditLogs, Profile 
+  Settlement, History, Reports, Members, AuditLogs, Profile, RoommateAvatar
 } from './components.jsx';
 
 export default function App() {
@@ -293,8 +293,8 @@ export default function App() {
         <div className="border-t border-slate-800/80 pt-4 mt-4 space-y-3">
           <div className="flex items-center justify-between px-2">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-xs font-bold text-white uppercase border border-slate-700">
-                {user.name.charAt(0)}
+              <div className="w-8 h-8 rounded-full bg-slate-800 overflow-hidden border border-slate-700 flex items-center justify-center">
+                <RoommateAvatar name={user.name} />
               </div>
               <div className="truncate w-24">
                 <div className="text-xs font-bold text-white truncate">{user.name}</div>
@@ -354,8 +354,8 @@ export default function App() {
             <div className="w-72 bg-slate-900 text-slate-300 h-full p-6 shadow-2xl flex flex-col justify-between" onClick={(e) => e.stopPropagation()}>
               <div className="space-y-6">
                 <div className="flex items-center gap-3 pb-4 border-b border-slate-800">
-                  <div className="w-10 h-10 rounded-full bg-brand-500/10 text-brand-500 flex items-center justify-center font-bold text-sm">
-                    {user.name.charAt(0)}
+                  <div className="w-10 h-10 rounded-full bg-slate-800 overflow-hidden border border-slate-700 flex items-center justify-center">
+                    <RoommateAvatar name={user.name} />
                   </div>
                   <div>
                     <div className="text-sm font-bold text-white">{user.name}</div>
