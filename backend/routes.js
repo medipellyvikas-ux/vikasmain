@@ -97,6 +97,47 @@ router.post('/auth/login', async (req, res) => {
   }
 });
 
+// Get active members list without credentials (public for login screen selection)
+router.get('/auth/members', async (req, res) => {
+  try {
+    const members = await queryAll(
+      "SELECT id, name, username, role, status FROM members WHERE status = 'active'"
+    );
+    res.json(members);
+  } catch (err) {
+    res.status(500).json({ message: 'Database error', error: err.message });
+  }
+});
+
+// Reset admin credentials back to default admin/admin123
+router.post('/auth/reset-admin', async (req, res) => {
+  try {
+    const adminPasswordHash = bcrypt.hashSync('admin123', 10);
+    const admin = await queryGet("SELECT id FROM members WHERE role = 'admin'");
+    if (admin) {
+      await queryRun(
+        "UPDATE members SET username = 'admin', password = ?, status = 'active' WHERE id = ?",
+        [adminPasswordHash, admin.id]
+      );
+    } else {
+      await queryRun(
+        "INSERT INTO members (name, mobile, username, password, role, status) VALUES (?, ?, ?, ?, ?, ?)",
+        ['Admin User', '9999999999', 'admin', adminPasswordHash, 'admin', 'active']
+      );
+    }
+    
+    // Log the reset activity in audit log
+    await queryRun(
+      'INSERT INTO audit_logs (action, details) VALUES (?, ?)',
+      ['Admin Reset', 'Admin username reset to "admin" and password to "admin123" via Login Portal']
+    );
+
+    res.json({ message: 'Admin login reset to "admin" and password to "admin123" successfully!' });
+  } catch (err) {
+    res.status(500).json({ message: 'Database error', error: err.message });
+  }
+});
+
 // ---------------- MEMBER ROUTES ----------------
 
 // Get all members

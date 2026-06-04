@@ -36,15 +36,34 @@ const formatCurrency = (val) => {
 
 // ---------------- LOGIN COMPONENT ----------------
 export function Login({ onLogin }) {
-  const [username, setUsername] = useState('');
+  const [members, setMembers] = useState([]);
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [adminMode, setAdminMode] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [membersLoading, setMembersLoading] = useState(true);
+  const [adminResetMsg, setAdminResetMsg] = useState('');
 
-  const handleSubmit = async (e) => {
+  // Fetch active roommates on mount
+  React.useEffect(() => {
+    fetch('/api/auth/members')
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setMembers(data);
+        }
+      })
+      .catch((err) => console.error('Error fetching roommates:', err))
+      .finally(() => setMembersLoading(false));
+  }, []);
+
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
+
+    const username = adminMode ? 'admin' : selectedMember?.username;
 
     try {
       const res = await fetch('/api/auth/login', {
@@ -64,63 +83,208 @@ export function Login({ onLogin }) {
     }
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brand-950 via-slate-950 to-navy-950 p-4">
-      <div className="w-full max-w-md glass-panel p-8 rounded-3xl shadow-premium bg-white/10 dark:bg-navy-900/40 border-white/20">
-        <div className="text-center mb-8">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-tr from-brand-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg shadow-brand-500/20 mb-4 animate-pulse">
-            <DollarSign className="w-9 h-9 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-brand-400 to-cyan-400 bg-clip-text text-transparent">
-            Room Expense Tracker
-          </h1>
-          <p className="text-slate-400 mt-2 font-medium">Shared Finance for Bachelor Rooms</p>
-        </div>
+  const handleResetAdmin = async () => {
+    if (!window.confirm('Reset Admin credentials to default username "admin" and password "admin123"?')) return;
+    try {
+      const res = await fetch('/api/auth/reset-admin', { method: 'POST' });
+      const data = await res.json();
+      if (res.ok) {
+        setAdminResetMsg(data.message);
+        setError('');
+        // Auto-close message after 5 seconds
+        setTimeout(() => setAdminResetMsg(''), 6000);
+      } else {
+        setError(data.message || 'Admin reset failed');
+      }
+    } catch (err) {
+      setError('Connection error: ' + err.message);
+    }
+  };
 
+  // Color mappings matching SpendLens illustrated circles
+  const getAvatarStyle = (index, name) => {
+    const styles = [
+      { border: 'border-emerald-500/80 hover:border-emerald-400', text: 'text-emerald-500', shadow: 'shadow-emerald-500/10', ring: 'ring-emerald-500/20' },
+      { border: 'border-indigo-500/80 hover:border-indigo-400', text: 'text-indigo-500', shadow: 'shadow-indigo-500/10', ring: 'ring-indigo-500/20' },
+      { border: 'border-amber-500/80 hover:border-amber-400', text: 'text-amber-500', shadow: 'shadow-amber-500/10', ring: 'ring-amber-500/20' },
+      { border: 'border-rose-500/80 hover:border-rose-400', text: 'text-rose-500', shadow: 'shadow-rose-500/10', ring: 'ring-rose-500/20' },
+      { border: 'border-cyan-500/80 hover:border-cyan-400', text: 'text-cyan-500', shadow: 'shadow-cyan-500/10', ring: 'ring-cyan-500/20' }
+    ];
+    return styles[index % styles.length];
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brand-950/40 via-slate-950 to-navy-950 p-6 transition-all duration-300">
+      
+      {/* Upper Logo / Branding (SpendLens theme) */}
+      <div className="text-center mb-10 select-none max-w-xl">
+        <div className="relative mx-auto w-24 h-24 mb-4 flex items-center justify-center">
+          {/* Custom vector SpendLens magnifying glass logo */}
+          <svg className="w-16 h-16 text-cyan-400 drop-shadow-[0_0_15px_rgba(6,182,212,0.3)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.3-4.3" />
+            <path d="M11 8v6M8 11h6" className="stroke-brand-500" strokeWidth="2.5" />
+          </svg>
+        </div>
+        
+        <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-brand-400 via-cyan-400 to-indigo-400 bg-clip-text text-transparent">
+          SpendLens
+        </h1>
+        <p className="text-slate-400/90 text-sm mt-2 font-medium tracking-wide">
+          Collaborative expense intelligence for your household
+        </p>
+      </div>
+
+      {/* Main card panel container */}
+      <div className="w-full max-w-4xl bg-slate-900/40 dark:bg-navy-900/30 backdrop-blur-xl border border-slate-800/60 p-8 rounded-[36px] shadow-2xl relative">
+        
+        {/* Error alerts */}
         {error && (
-          <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-rose-300 text-sm flex items-center gap-3">
+          <div className="mb-6 mx-auto max-w-md p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-rose-300 text-xs flex items-center gap-3">
             <AlertTriangle className="w-5 h-5 flex-shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Username</label>
-            <input 
-              type="text"
-              required
-              placeholder="e.g. member1"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full bg-slate-950/60 border border-slate-700/50 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-brand-500 transition duration-200"
-            />
+        {/* Success alerts */}
+        {adminResetMsg && (
+          <div className="mb-6 mx-auto max-w-md p-4 bg-brand-500/10 border border-brand-500/20 rounded-2xl text-brand-300 text-xs flex items-center gap-3">
+            <CheckCircle className="w-5 h-5 flex-shrink-0" />
+            <span>{adminResetMsg}</span>
           </div>
+        )}
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Password</label>
-            <input 
-              type="password"
-              required
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-slate-950/60 border border-slate-700/50 rounded-2xl px-5 py-4 text-white focus:outline-none focus:border-brand-500 transition duration-200"
-            />
+        {/* LOADING STATE */}
+        {membersLoading && !selectedMember && !adminMode && (
+          <div className="py-12 text-center text-slate-400 text-sm font-semibold flex flex-col items-center gap-3">
+            <RefreshCw className="w-8 h-8 text-brand-500 animate-spin" />
+            <span>Scanning household directories...</span>
           </div>
+        )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-gradient-to-r from-brand-500 to-cyan-500 text-white font-bold py-4 rounded-2xl hover:opacity-95 shadow-lg shadow-brand-500/15 focus:outline-none transition duration-200 flex items-center justify-center gap-2"
-          >
-            {loading ? 'Authenticating...' : 'Secure Login'}
-          </button>
-        </form>
+        {/* SCREEN 1: ROOMMATE SELECTION CARDS */}
+        {!selectedMember && !adminMode && !membersLoading && (
+          <div className="space-y-8">
+            <div className="text-center">
+              <h2 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Sign In As</h2>
+            </div>
 
-        <div className="mt-8 text-center text-xs text-slate-500">
-          <p>Seeded: admin/admin123 or member1/password123</p>
-        </div>
+            {/* Grid of Avatars */}
+            <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8">
+              {members.map((m, idx) => {
+                const colors = getAvatarStyle(idx, m.name);
+                const initials = m.name.substring(0, 2);
+                
+                return (
+                  <button
+                    key={m.id}
+                    onClick={() => { setSelectedMember(m); setError(''); setPassword(''); }}
+                    className="flex flex-col items-center gap-3 group focus:outline-none"
+                  >
+                    {/* Illustrated Circular Avatar container */}
+                    <div className={`w-20 h-20 rounded-full border-[3px] ${colors.border} ${colors.shadow} shadow-lg flex items-center justify-center transition-all duration-300 transform group-hover:scale-105 group-active:scale-95 group-hover:ring-8 ${colors.ring}`}>
+                      <div className={`w-[90%] h-[90%] rounded-full bg-slate-950 flex items-center justify-center font-bold text-lg ${colors.text} tracking-wide`}>
+                        {initials}
+                      </div>
+                    </div>
+
+                    {/* Roommate Name label */}
+                    <span className="font-bold text-slate-200 group-hover:text-white transition text-sm">
+                      {m.name}
+                    </span>
+
+                    {/* Caret caret */}
+                    <ArrowRight className={`w-4 h-4 ${colors.text} opacity-70 group-hover:opacity-100 transform group-hover:translate-x-1 transition duration-200`} />
+                  </button>
+                );
+              })}
+
+              {/* If no members found (empty db) */}
+              {members.length === 0 && (
+                <div className="py-6 text-center text-slate-500 text-xs">
+                  No roommates registered yet. Use System Admin to create members.
+                </div>
+              )}
+            </div>
+
+            {/* Admin toggle footer */}
+            <div className="border-t border-slate-800/80 pt-6 mt-4 flex justify-center">
+              <button
+                onClick={() => { setAdminMode(true); setError(''); setPassword(''); }}
+                className="flex items-center gap-2 px-5 py-3 rounded-xl bg-slate-900 border border-slate-800 text-xs font-semibold text-slate-400 hover:text-white hover:border-slate-700 transition"
+              >
+                <Shield className="w-4 h-4 text-violet-500" />
+                <span>System Administration</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* SCREEN 2: PASSWORD CREDENTIAL PROMPT */}
+        {(selectedMember || adminMode) && (
+          <div className="max-w-md mx-auto py-4">
+            <div className="text-center mb-6">
+              <div className="mx-auto w-16 h-16 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center mb-3">
+                {adminMode ? (
+                  <Shield className="w-7 h-7 text-violet-500" />
+                ) : (
+                  <User className="w-7 h-7 text-brand-500" />
+                )}
+              </div>
+              <h3 className="text-lg font-bold text-slate-100">
+                {adminMode ? 'System Admin Portal' : `Sign in as ${selectedMember?.name}`}
+              </h3>
+              <p className="text-xs text-slate-500 mt-1">Enter your password to open room dashboard</p>
+            </div>
+
+            <form onSubmit={handleLoginSubmit} className="space-y-4">
+              <div>
+                <input
+                  type="password"
+                  required
+                  autoFocus
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-slate-950/80 border border-slate-800 rounded-2xl px-5 py-4 text-white text-center text-sm focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500/20 tracking-widest transition"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-brand-500 to-cyan-500 text-white font-bold py-3.5 rounded-2xl hover:opacity-95 shadow-lg shadow-brand-500/10 transition flex items-center justify-center gap-2 text-xs"
+              >
+                {loading ? 'Verifying...' : 'Unlock Workspace'}
+              </button>
+
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 text-[11px]">
+                <button
+                  type="button"
+                  onClick={() => { setSelectedMember(null); setAdminMode(false); setError(''); }}
+                  className="text-slate-400 hover:text-white transition"
+                >
+                  ← Back to Roommates
+                </button>
+
+                {adminMode && (
+                  <button
+                    type="button"
+                    onClick={handleResetAdmin}
+                    className="text-rose-400 hover:text-rose-300 font-semibold transition"
+                  >
+                    Forgot Admin Credentials? (Reset)
+                  </button>
+                )}
+              </div>
+            </form>
+          </div>
+        )}
+
+      </div>
+
+      <div className="mt-8 text-center text-[10px] text-slate-600 font-semibold uppercase tracking-wider">
+        <span>SpendLens Room Intel v1.2 • Production Build</span>
       </div>
     </div>
   );
@@ -324,9 +488,9 @@ export function Dashboard({ data, user, transactions }) {
               <BarChart data={memberContributionsData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
                 <XAxis dataKey="name" stroke="#94a3b8" fontSize={10} tickLine={false} />
-                <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} width={30} />
+                <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} width={30} domain={[0, dataMax => dataMax > 0 ? 'auto' : 1000]} />
                 <Tooltip formatter={(value) => formatCurrency(value)} cursor={{ fill: 'transparent' }} />
-                <Bar dataKey="contributed" fill="#10b981" radius={[8, 8, 0, 0]}>
+                <Bar dataKey="contributed" fill="#10b981" radius={[8, 8, 0, 0]} maxBarSize={35}>
                   {memberContributionsData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}

@@ -212,13 +212,13 @@ export const initDatabase = async () => {
         ['Admin User', '9999999999', 'admin', adminPasswordHash, 'admin', 'active']
       );
 
-      // Add Default Members 1 to 5
+      // Add Default Members 1 to 5 (SpendLens names)
       const defaultMembers = [
-        { name: 'Vikas', mobile: '9876543210', username: 'member1' },
-        { name: 'Rahul', mobile: '9876543211', username: 'member2' },
-        { name: 'Amit', mobile: '9876543212', username: 'member3' },
-        { name: 'Sandeep', mobile: '9876543213', username: 'member4' },
-        { name: 'Deepak', mobile: '9876543214', username: 'member5' }
+        { name: 'Akhil', mobile: '9876543210', username: 'member1' },
+        { name: 'Vikas', mobile: '9876543211', username: 'member2' },
+        { name: 'Jithu', mobile: '9876543212', username: 'member3' },
+        { name: 'Bhanu', mobile: '9876543213', username: 'member4' },
+        { name: 'Jagan', mobile: '9876543214', username: 'member5' }
       ];
 
       for (const m of defaultMembers) {
