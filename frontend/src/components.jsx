@@ -491,12 +491,15 @@ export function Dashboard({ data, user, transactions }) {
 
   // Chart 1: Category Wise Pie Chart
   const pieChartData = useMemo(() => {
-    // Collect active expenses (not closed)
+    if (!Array.isArray(transactions)) return [];
     const categoryTotals = {};
     transactions
-      .filter(t => t.type === 'expense' && !t.closed_month)
+      .filter(t => t && t.type === 'expense' && !t.closed_month)
       .forEach(t => {
-        categoryTotals[t.category] = (categoryTotals[t.category] || 0) + t.amount;
+        const amt = Number(t.amount);
+        if (!isNaN(amt)) {
+          categoryTotals[t.category] = (categoryTotals[t.category] || 0) + amt;
+        }
       });
 
     return Object.keys(categoryTotals).map(cat => ({
@@ -507,22 +510,27 @@ export function Dashboard({ data, user, transactions }) {
 
   // Chart 2: Member Contribution Comparison
   const memberContributionsData = useMemo(() => {
+    if (!data || !Array.isArray(data.members)) return [];
     return data.members.map(m => ({
-      name: m.name,
-      contributed: m.contributed
+      name: m.name || '',
+      contributed: Number(m.contributed) || 0
     }));
   }, [data]);
 
   // Chart 3: Monthly Spending Trend (from transaction history closed months + current)
   const monthlyTrendData = useMemo(() => {
+    if (!Array.isArray(transactions)) return [];
     const monthlyGroups = {};
     
     // Scan all transactions (even closed ones) to build trend
     transactions
-      .filter(t => t.type === 'expense')
+      .filter(t => t && t.type === 'expense' && t.date)
       .forEach(t => {
         const month = t.date.substring(0, 7); // YYYY-MM
-        monthlyGroups[month] = (monthlyGroups[month] || 0) + t.amount;
+        const amt = Number(t.amount);
+        if (month && !isNaN(amt)) {
+          monthlyGroups[month] = (monthlyGroups[month] || 0) + amt;
+        }
       });
 
     return Object.keys(monthlyGroups)
@@ -678,21 +686,28 @@ export function Dashboard({ data, user, transactions }) {
         {/* Member contribution comparison */}
         <div className="lg:col-span-1 glass-panel p-6 rounded-3xl shadow-premium dark:bg-navy-900/60 min-h-[350px] flex flex-col">
           <h3 className="text-sm font-bold text-slate-800 dark:text-white mb-3">Member Contributions</h3>
-          <div className="h-[220px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={memberContributionsData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
-                <XAxis dataKey="name" stroke="#94a3b8" fontSize={10} tickLine={false} />
-                <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} width={30} domain={[0, dataMax => dataMax > 0 ? 'auto' : 1000]} />
-                <Tooltip formatter={(value) => formatCurrency(value)} cursor={{ fill: 'transparent' }} />
-                <Bar dataKey="contributed" fill="#10b981" radius={[8, 8, 0, 0]} maxBarSize={35}>
-                  {memberContributionsData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={getRoommateColor(entry.name)} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+          {memberContributionsData.length === 0 ? (
+            <div className="flex-1 flex flex-col items-center justify-center text-slate-400 text-xs">
+              <Users className="w-10 h-10 mb-2 opacity-55" />
+              <span>No member data available</span>
+            </div>
+          ) : (
+            <div className="h-[220px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={memberContributionsData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                  <XAxis dataKey="name" stroke="#94a3b8" fontSize={10} tickLine={false} />
+                  <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} width={30} domain={[0, dataMax => (typeof dataMax === 'number' && !isNaN(dataMax) && dataMax > 0) ? 'auto' : 1000]} />
+                  <Tooltip formatter={(value) => formatCurrency(value)} cursor={{ fill: 'transparent' }} />
+                  <Bar dataKey="contributed" fill="#10b981" radius={[8, 8, 0, 0]} maxBarSize={35}>
+                    {memberContributionsData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={getRoommateColor(entry.name)} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
         </div>
 
         {/* Monthly Spending Trend */}
