@@ -1,19 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import { 
   DollarSign, ArrowUpRight, ArrowDownRight, Users, ClipboardList,
-  FileText, Shield, User, LogOut, Sun, Moon, Menu, X, QrCode, Sparkles, RefreshCw
+  FileText, Shield, User, LogOut, Sun, Moon, Menu, X, QrCode, Sparkles, RefreshCw,
+  Flame, Dumbbell, Apple, Scale, Trophy, Activity, Bell, CheckCircle2
 } from 'lucide-react';
 import { 
   Login, Dashboard, Contributions, Expenses, 
   Settlement, History, Reports, Members, AuditLogs, Profile, RoommateAvatar
 } from './components.jsx';
 
+// Import gym pages
+import GymDashboard from './pages/GymDashboard.jsx';
+import WorkoutPlan from './pages/WorkoutPlan.jsx';
+import ExerciseLibrary from './pages/ExerciseLibrary.jsx';
+import NutritionTracker from './pages/NutritionTracker.jsx';
+import ProgressSection from './pages/ProgressSection.jsx';
+import GymAnalytics from './pages/GymAnalytics.jsx';
+import Gamification from './pages/Gamification.jsx';
+import GymAdminPanel from './pages/AdminPanel.jsx';
+
+export const AuthContext = createContext(null);
+const ToastContext = createContext(null);
+export const useToast = () => useContext(ToastContext);
+
 export default function App() {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')) || null);
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [workspace, setWorkspace] = useState(localStorage.getItem('workspace') || 'expenses');
+  const [activeTab, setActiveTab] = useState(workspace === 'expenses' ? 'dashboard' : 'gym-dashboard');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [toasts, setToasts] = useState([]);
 
   // Global Data states
   const [report, setReport] = useState({
@@ -45,6 +62,51 @@ export default function App() {
     }
     localStorage.setItem('theme', theme);
   }, [theme]);
+
+  // Sync fitness profile on start / token change
+  const fetchFitnessProfile = async () => {
+    if (!token) return;
+    try {
+      const res = await fetch('/api/gym/user/profile', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const fitnessData = await res.json();
+        setUser(prev => {
+          if (!prev) return prev;
+          const updated = { ...prev, ...fitnessData };
+          localStorage.setItem('user', JSON.stringify(updated));
+          return updated;
+        });
+      }
+    } catch (err) {
+      console.error('Failed to load fitness profile:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (token) {
+      fetchFitnessProfile();
+    }
+  }, [token, workspace]);
+
+  const addToast = (title, message, type = 'info') => {
+    const id = Date.now();
+    setToasts(prev => [...prev, { id, title, message, type }]);
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 5000);
+  };
+
+  const handleWorkspaceChange = (newWorkspace) => {
+    setWorkspace(newWorkspace);
+    localStorage.setItem('workspace', newWorkspace);
+    if (newWorkspace === 'expenses') {
+      setActiveTab('dashboard');
+    } else {
+      setActiveTab('gym-dashboard');
+    }
+  };
 
   // Synchronize data
   const fetchData = async () => {
@@ -108,15 +170,17 @@ export default function App() {
 
   const handleLogin = (newToken, loggedUser) => {
     localStorage.setItem('token', newToken);
+    localStorage.setItem('gym_token', newToken);
     localStorage.setItem('user', JSON.stringify(loggedUser));
     localStorage.setItem('loginTime', Date.now().toString());
     setToken(newToken);
     setUser(loggedUser);
-    setActiveTab('dashboard');
+    setActiveTab(workspace === 'expenses' ? 'dashboard' : 'gym-dashboard');
   };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('gym_token');
     localStorage.removeItem('user');
     localStorage.removeItem('loginTime');
     setToken('');
@@ -272,33 +336,70 @@ export default function App() {
 
   // Sidebar navigation items
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: DollarSign, roles: ['admin', 'member'] },
-    { id: 'expenses', label: 'Expenses', icon: ArrowDownRight, roles: ['admin', 'member'] },
-    { id: 'contributions', label: 'Contributions', icon: ArrowUpRight, roles: ['admin', 'member'] },
-    { id: 'settlements', label: 'Settlements', icon: QrCode, roles: ['admin', 'member'] },
-    { id: 'history', label: 'History Logs', icon: ClipboardList, roles: ['admin', 'member'] },
-    { id: 'reports', label: 'Reports & Closing', icon: FileText, roles: ['admin', 'member'] },
-    { id: 'members', label: 'Manage Members', icon: Users, roles: ['admin'] },
-    { id: 'audit', label: 'Audit Trail', icon: Shield, roles: ['admin'] },
-    { id: 'profile', label: 'My Settings', icon: User, roles: ['admin', 'member'] }
+    // Room Expenses Workspace
+    { id: 'dashboard', label: 'Dashboard', icon: DollarSign, roles: ['admin', 'member'], workspace: 'expenses' },
+    { id: 'expenses', label: 'Expenses', icon: ArrowDownRight, roles: ['admin', 'member'], workspace: 'expenses' },
+    { id: 'contributions', label: 'Contributions', icon: ArrowUpRight, roles: ['admin', 'member'], workspace: 'expenses' },
+    { id: 'settlements', label: 'Settlements', icon: QrCode, roles: ['admin', 'member'], workspace: 'expenses' },
+    { id: 'history', label: 'History Logs', icon: ClipboardList, roles: ['admin', 'member'], workspace: 'expenses' },
+    { id: 'reports', label: 'Reports & Closing', icon: FileText, roles: ['admin', 'member'], workspace: 'expenses' },
+    { id: 'members', label: 'Manage Members', icon: Users, roles: ['admin'], workspace: 'expenses' },
+    { id: 'audit', label: 'Audit Trail', icon: Shield, roles: ['admin'], workspace: 'expenses' },
+    { id: 'profile', label: 'My Settings', icon: User, roles: ['admin', 'member'], workspace: 'expenses' },
+
+    // Gym Workspace
+    { id: 'gym-dashboard', label: 'Dashboard', icon: Activity, roles: ['admin', 'member'], workspace: 'gym' },
+    { id: 'workouts', label: 'Workout Plan', icon: Dumbbell, roles: ['admin', 'member'], workspace: 'gym' },
+    { id: 'exercises', label: 'Exercise Library', icon: ClipboardList, roles: ['admin', 'member'], workspace: 'gym' },
+    { id: 'nutrition', label: 'Nutrition Tracker', icon: Apple, roles: ['admin', 'member'], workspace: 'gym' },
+    { id: 'progress', label: 'Body Progress', icon: Scale, roles: ['admin', 'member'], workspace: 'gym' },
+    { id: 'analytics', label: 'Analytics', icon: RefreshCw, roles: ['admin', 'member'], workspace: 'gym' },
+    { id: 'gamification', label: 'Gamification', icon: Trophy, roles: ['admin', 'member'], workspace: 'gym' },
+    { id: 'gym-admin', label: 'Gym Admin', icon: Shield, roles: ['admin'], workspace: 'gym' },
   ];
 
-  const activeMenuItems = menuItems.filter(item => item.roles.includes(user.role));
+  const activeMenuItems = menuItems.filter(item => item.workspace === workspace && item.roles.includes(user.role));
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 dark:bg-navy-950">
+    <AuthContext.Provider value={{ user, token, handleLogout, setUser }}>
+      <ToastContext.Provider value={{ addToast }}>
+        <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 dark:bg-navy-950">
       
       {/* 1. DESKTOP SIDEBAR */}
       <aside className="hidden md:flex flex-col w-64 bg-slate-900 text-slate-300 border-r border-slate-800/80 sticky top-0 h-screen p-5 flex-shrink-0">
         {/* Brand header */}
-        <div className="flex items-center gap-3 mb-8 px-2">
+        <div className="flex items-center gap-3 mb-6 px-2">
           <div className="w-10 h-10 bg-gradient-to-tr from-brand-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-brand-500/10">
-            <DollarSign className="w-5 h-5 text-white" />
+            {workspace === 'expenses' ? <DollarSign className="w-5 h-5 text-white" /> : <Dumbbell className="w-5 h-5 text-white" />}
           </div>
           <div>
-            <h1 className="font-bold text-sm text-white tracking-tight">Bachelors Room</h1>
+            <h1 className="font-bold text-sm text-white tracking-tight">Bachelors Hub</h1>
             <span className="text-[10px] text-slate-400 font-semibold tracking-wider uppercase">{user.role} workspace</span>
           </div>
+        </div>
+
+        {/* Workspace Switcher */}
+        <div className="mb-6 p-1 bg-slate-950/40 rounded-xl border border-slate-800/60 flex">
+          <button
+            onClick={() => handleWorkspaceChange('expenses')}
+            className={`flex-1 py-1.5 text-center text-[10px] font-black uppercase tracking-wider rounded-lg transition-all ${
+              workspace === 'expenses' 
+                ? 'bg-gradient-to-r from-brand-500 to-brand-600 text-white shadow shadow-brand-500/10' 
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            Expenses
+          </button>
+          <button
+            onClick={() => handleWorkspaceChange('gym')}
+            className={`flex-1 py-1.5 text-center text-[10px] font-black uppercase tracking-wider rounded-lg transition-all ${
+              workspace === 'gym' 
+                ? 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-white shadow shadow-cyan-500/10' 
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            Gym
+          </button>
         </div>
 
         {/* Tab links */}
@@ -393,6 +494,30 @@ export default function App() {
                   </div>
                 </div>
 
+                {/* Mobile Workspace Switcher */}
+                <div className="p-1 bg-slate-950/40 rounded-xl border border-slate-800/60 flex">
+                  <button
+                    onClick={() => handleWorkspaceChange('expenses')}
+                    className={`flex-1 py-1.5 text-center text-[10px] font-black uppercase tracking-wider rounded-lg transition-all ${
+                      workspace === 'expenses' 
+                        ? 'bg-gradient-to-r from-brand-500 to-brand-600 text-white shadow' 
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    Expenses
+                  </button>
+                  <button
+                    onClick={() => handleWorkspaceChange('gym')}
+                    className={`flex-1 py-1.5 text-center text-[10px] font-black uppercase tracking-wider rounded-lg transition-all ${
+                      workspace === 'gym' 
+                        ? 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-white shadow' 
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    Gym
+                  </button>
+                </div>
+
                 <nav className="space-y-1">
                   {activeMenuItems.map((item) => {
                     const Icon = item.icon;
@@ -455,6 +580,7 @@ export default function App() {
 
           {/* Core View Switch router */}
           <div className="relative">
+            {/* Room Expenses Tabs */}
             {activeTab === 'dashboard' && (
               <Dashboard data={report} user={user} transactions={transactions} />
             )}
@@ -513,12 +639,38 @@ export default function App() {
                 isAdmin={user.role === 'admin'}
               />
             )}
+
+            {/* Gym Tracker Tabs */}
+            {activeTab === 'gym-dashboard' && (
+              <GymDashboard onNavigate={setActiveTab} />
+            )}
+            {activeTab === 'workouts' && (
+              <WorkoutPlan />
+            )}
+            {activeTab === 'exercises' && (
+              <ExerciseLibrary />
+            )}
+            {activeTab === 'nutrition' && (
+              <NutritionTracker />
+            )}
+            {activeTab === 'progress' && (
+              <ProgressSection />
+            )}
+            {activeTab === 'analytics' && (
+              <GymAnalytics />
+            )}
+            {activeTab === 'gamification' && (
+              <Gamification />
+            )}
+            {activeTab === 'gym-admin' && (
+              <GymAdminPanel />
+            )}
           </div>
         </main>
 
         {/* 3. MOBILE BOTTOM NAVIGATION TAB BAR */}
         <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800/80 z-40 flex items-center justify-around py-2 px-1 safe-bottom">
-          {menuItems.slice(0, 4).map((item) => {
+          {activeMenuItems.slice(0, 4).map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
             return (
@@ -545,5 +697,30 @@ export default function App() {
 
       </div>
     </div>
+        
+    {/* Toast rendering */}
+        <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full">
+          {toasts.map(t => (
+            <div 
+              key={t.id} 
+              className={`p-4 rounded-xl shadow-lg border flex gap-3 transform transition-all duration-300 ${
+                t.type === 'success' ? 'border-emerald-500/30 bg-emerald-950/20 text-emerald-200' : 
+                t.type === 'warning' ? 'border-amber-500/30 bg-amber-950/20 text-amber-200' : 
+                t.type === 'error' ? 'border-rose-500/30 bg-rose-950/20 text-rose-200' : 'border-blue-500/30 bg-blue-950/20 text-blue-200'
+              }`}
+            >
+              {t.type === 'success' ? <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" /> :
+               t.type === 'warning' ? <Bell className="w-5 h-5 text-amber-400 shrink-0" /> :
+               t.type === 'error' ? <X className="w-5 h-5 text-rose-400 shrink-0" /> :
+               <Bell className="w-5 h-5 text-blue-400 shrink-0" />}
+              <div>
+                <h4 className="font-semibold text-sm">{t.title}</h4>
+                <p className="text-xs opacity-80 mt-0.5">{t.message}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </ToastContext.Provider>
+    </AuthContext.Provider>
   );
 }

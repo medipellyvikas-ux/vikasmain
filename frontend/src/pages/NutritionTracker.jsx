@@ -1,0 +1,415 @@
+import React, { useState, useEffect } from 'react';
+import { useToast } from '../App';
+import { 
+  Apple, 
+  Flame, 
+  UtensilsCrossed, 
+  Moon, 
+  Plus, 
+  Minus, 
+  Save, 
+  TrendingUp, 
+  PlusCircle,
+  HelpCircle,
+  Activity,
+  Heart
+} from 'lucide-react';
+
+const NUTRITION_ITEMS = [
+  { key: 'eggs', name: 'Eggs', unit: 'Count', protein: 6, calories: 70, multiplier: 1 },
+  { key: 'chicken', name: 'Chicken Breast', unit: 'Grams', protein: 0.31, calories: 1.65, multiplier: 100 },
+  { key: 'fish', name: 'Fish Fillet', unit: 'Grams', protein: 0.25, calories: 1.2, multiplier: 100 },
+  { key: 'milk', name: 'Whole Milk', unit: 'ml', protein: 0.033, calories: 0.6, multiplier: 100 },
+  { key: 'curd', name: 'Greek Curd', unit: 'Grams', protein: 0.04, calories: 0.98, multiplier: 100 },
+  { key: 'paneer', name: 'Paneer / Cottage Cheese', unit: 'Grams', protein: 0.18, calories: 3.65, multiplier: 100 },
+  { key: 'whey_protein', name: 'Whey Protein', unit: 'Scoops', protein: 24, calories: 120, multiplier: 1 }
+];
+
+export default function NutritionTracker() {
+  const { addToast } = useToast();
+  const todayStr = new Date().toISOString().split('T')[0];
+
+  const [date, setDate] = useState(todayStr);
+
+  // Nutrition Log State
+  const [log, setLog] = useState({
+    eggs: 0,
+    chicken: 0,
+    fish: 0,
+    milk: 0,
+    curd: 0,
+    paneer: 0,
+    whey_protein: 0,
+    custom_protein: 0,
+    custom_calories: 0
+  });
+
+  // Custom single food input
+  const [customProtInput, setCustomProtInput] = useState('');
+  const [customCalInput, setCustomCalInput] = useState('');
+
+  // Sleep Log State
+  const [sleep, setSleep] = useState({
+    bed_time: '',
+    wake_time: '',
+    quality: 'Good'
+  });
+
+  useEffect(() => {
+    fetchLogs();
+  }, [date]);
+
+  const fetchLogs = async () => {
+    const token = localStorage.getItem('gym_token');
+    if (!token) return;
+
+    try {
+      // Nutrition
+      const nutRes = await fetch(`/api/gym/nutrition?date=${date}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (nutRes.ok) {
+        const nutData = await nutRes.json();
+        setLog(nutData);
+      }
+
+      // Sleep
+      const sleepRes = await fetch(`/api/gym/sleep?date=${date}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (sleepRes.ok) {
+        const sleepData = await sleepRes.json();
+        setSleep({
+          bed_time: sleepData.bed_time || '',
+          wake_time: sleepData.wake_time || '',
+          quality: sleepData.quality || 'Good'
+        });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleUpdateItem = (key, amt) => {
+    setLog(prev => {
+      const current = parseFloat(prev[key] || 0);
+      const updated = Math.max(0, current + amt);
+      return { ...prev, [key]: updated };
+    });
+  };
+
+  const handleSaveNutrition = async () => {
+    const token = localStorage.getItem('gym_token');
+    try {
+      const res = await fetch('/api/gym/nutrition', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ date, ...log })
+      });
+      if (res.ok) {
+        addToast("Nutrition Saved", "Daily protein and calorie data logged.", "success");
+      } else {
+        throw new Error('Failed to save log');
+      }
+    } catch (err) {
+      addToast("Error", err.message, "error");
+    }
+  };
+
+  const handleSaveSleep = async () => {
+    const token = localStorage.getItem('gym_token');
+    if (!sleep.bed_time || !sleep.wake_time) {
+      addToast("Missing times", "Please input both bed time and wake time.", "warning");
+      return;
+    }
+    try {
+      const res = await fetch('/api/gym/sleep', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ date, ...sleep })
+      });
+      if (res.ok) {
+        addToast("Sleep Logged", "Sleep times and recovery quality index saved.", "success");
+      } else {
+        throw new Error('Failed to save sleep log');
+      }
+    } catch (err) {
+      addToast("Error", err.message, "error");
+    }
+  };
+
+  const handleAddCustom = () => {
+    if (!customProtInput && !customCalInput) return;
+    const pVal = parseFloat(customProtInput || 0);
+    const cVal = parseFloat(customCalInput || 0);
+    setLog(prev => ({
+      ...prev,
+      custom_protein: Math.round((parseFloat(prev.custom_protein || 0) + pVal) * 10) / 10,
+      custom_calories: Math.round((parseFloat(prev.custom_calories || 0) + cVal) * 10) / 10
+    }));
+    setCustomProtInput('');
+    setCustomCalInput('');
+    addToast("Custom item added", "Custom protein and calorie values stacked.", "success");
+  };
+
+  // Calculations
+  const calculateTotalProtein = () => {
+    return Math.round(
+      NUTRITION_ITEMS.reduce((sum, item) => {
+        return sum + (parseFloat(log[item.key] || 0) * item.protein);
+      }, 0) + parseFloat(log.custom_protein || 0)
+    );
+  };
+
+  const calculateTotalCalories = () => {
+    return Math.round(
+      NUTRITION_ITEMS.reduce((sum, item) => {
+        return sum + (parseFloat(log[item.key] || 0) * item.calories);
+      }, 0) + parseFloat(log.custom_calories || 0)
+    );
+  };
+
+  const totalProtein = calculateTotalProtein();
+  const totalCalories = calculateTotalCalories();
+  const proteinPercent = Math.min(100, Math.round((totalProtein / 120) * 100));
+
+  // Sleep hours compute helper
+  const calculateSleepHours = () => {
+    if (!sleep.bed_time || !sleep.wake_time) return 0;
+    const [bH, bM] = sleep.bed_time.split(':').map(Number);
+    const [wH, wM] = sleep.wake_time.split(':').map(Number);
+    let bTime = new Date(date);
+    bTime.setHours(bH, bM, 0);
+    let wTime = new Date(date);
+    wTime.setHours(wH, wM, 0);
+    if (wTime < bTime) {
+      wTime.setDate(wTime.getDate() + 1);
+    }
+    return Math.round(((wTime - bTime) / (1000 * 60 * 60)) * 10) / 10;
+  };
+
+  const sleepHours = calculateSleepHours();
+
+  return (
+    <div className="space-y-6">
+      
+      {/* Date selector header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-panel p-6 rounded-2xl border border-zinc-800/80">
+        <div>
+          <span className="text-xs font-bold uppercase tracking-widest text-fitgreen-400 block mb-1">Nutrition & Recovery Trackers</span>
+          <h2 className="text-2xl font-black text-zinc-100 flex items-center gap-2">
+            <Apple className="w-6 h-6 text-fitgreen-500" />
+            Daily Fuel Logger
+          </h2>
+        </div>
+
+        <div className="relative">
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="glass-input text-xs font-bold w-40 text-center"
+          />
+        </div>
+      </div>
+
+      {/* Main Trackers split grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        
+        {/* Left Side: Food logger items (2 cols) */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="glass-panel p-6 rounded-3xl border border-zinc-800/80 space-y-6">
+            <div className="flex justify-between items-center border-b border-zinc-900 pb-3">
+              <h3 className="font-extrabold text-lg text-zinc-100 flex items-center gap-2">
+                <UtensilsCrossed className="w-5 h-5 text-fitgreen-400" />
+                Track Foods
+              </h3>
+              <button
+                onClick={handleSaveNutrition}
+                className="px-4 py-2 bg-fitgreen-600 hover:bg-fitgreen-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 transition-all shadow-lg"
+              >
+                <Save className="w-3.5 h-3.5" /> Save Food Logs
+              </button>
+            </div>
+
+            {/* List of high-protein items */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {NUTRITION_ITEMS.map(item => {
+                const loggedVal = log[item.key] || 0;
+                return (
+                  <div key={item.key} className="p-4 rounded-2xl bg-zinc-900/40 border border-zinc-800/60 flex items-center justify-between">
+                    <div>
+                      <span className="block font-bold text-zinc-200 text-sm">{item.name}</span>
+                      <span className="block text-[10px] text-zinc-500 mt-0.5">
+                        {item.unit === 'Grams' ? `100g portion` : item.unit === 'ml' ? `100ml portion` : `1 portion`}
+                        {' '}• {item.protein}g protein
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2.5">
+                      <button
+                        onClick={() => handleUpdateItem(item.key, item.unit === 'Grams' || item.unit === 'ml' ? -50 : -1)}
+                        disabled={loggedVal === 0}
+                        className="w-7 h-7 bg-zinc-900 border border-zinc-800 text-zinc-400 disabled:opacity-40 disabled:pointer-events-none rounded-lg flex items-center justify-center hover:bg-zinc-800 transition-colors"
+                      >
+                        <Minus className="w-3.5 h-3.5" />
+                      </button>
+                      <span className="w-16 text-center font-bold text-sm text-zinc-200">
+                        {loggedVal} <span className="text-[10px] text-zinc-500 font-normal">{item.unit === 'Grams' || item.unit === 'ml' ? item.unit : ''}</span>
+                      </span>
+                      <button
+                        onClick={() => handleUpdateItem(item.key, item.unit === 'Grams' || item.unit === 'ml' ? 50 : 1)}
+                        className="w-7 h-7 bg-zinc-900 border border-zinc-800 text-zinc-400 rounded-lg flex items-center justify-center hover:bg-zinc-800 transition-colors"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Custom food entry */}
+            <div className="border-t border-zinc-900 pt-5 space-y-3">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 block">Quick Log Other Foods</span>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <input
+                  type="number"
+                  placeholder="Custom Protein (g)"
+                  value={customProtInput}
+                  onChange={(e) => setCustomProtInput(e.target.value)}
+                  className="flex-1 glass-input text-xs"
+                />
+                <input
+                  type="number"
+                  placeholder="Custom Calories (kcal)"
+                  value={customCalInput}
+                  onChange={(e) => setCustomCalInput(e.target.value)}
+                  className="flex-1 glass-input text-xs"
+                />
+                <button
+                  onClick={handleAddCustom}
+                  className="px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all border border-zinc-800/80"
+                >
+                  <PlusCircle className="w-4 h-4 text-cyber-400" /> Add Custom
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Right Side: Targets rings & sleep logs (1 col) */}
+        <div className="space-y-6">
+          
+          {/* Targets breakdown summary card */}
+          <div className="glass-panel p-6 rounded-3xl border border-zinc-800/80 space-y-5">
+            <h3 className="font-extrabold text-lg text-zinc-100">Nutrition Targets</h3>
+            
+            {/* Protein bar */}
+            <div className="space-y-2">
+              <div className="flex justify-between text-xs font-bold">
+                <span className="text-zinc-400">Total Protein</span>
+                <span className="text-fitgreen-400">{totalProtein}g / 120g</span>
+              </div>
+              <div className="h-3 w-full bg-zinc-900 rounded-full overflow-hidden border border-zinc-800/50">
+                <div 
+                  className="h-full bg-gradient-to-r from-fitgreen-600 to-fitgreen-400 transition-all duration-500 rounded-full"
+                  style={{ width: `${proteinPercent}%` }}
+                ></div>
+              </div>
+            </div>
+
+            {/* Calories count */}
+            <div className="space-y-2">
+              <div className="flex justify-between text-xs font-bold">
+                <span className="text-zinc-400">Est. Total Calories</span>
+                <span className="text-cyber-400">{totalCalories} kcal</span>
+              </div>
+            </div>
+
+            <div className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/60 text-[10px] text-zinc-500 leading-relaxed">
+              <div className="flex gap-2 items-start">
+                <Heart className="w-4 h-4 text-fitgreen-400 shrink-0 mt-0.5" />
+                <span>
+                  For a 73 kg beginner male, maintaining 1.6g of protein per kg of body weight (approx 120g) prevents muscle soreness and optimizes muscle recovery after intense sessions.
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Sleep logger card */}
+          <div className="glass-panel p-6 rounded-3xl border border-zinc-800/80 space-y-4">
+            <div className="flex justify-between items-center border-b border-zinc-900 pb-3">
+              <h3 className="font-extrabold text-lg text-zinc-100 flex items-center gap-2">
+                <Moon className="w-5 h-5 text-indigo-400" />
+                Log Sleep
+              </h3>
+              <button
+                onClick={handleSaveSleep}
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 transition-all shadow-lg"
+              >
+                <Save className="w-3.5 h-3.5" /> Log
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-zinc-400 block uppercase">Bed Time</label>
+                <input
+                  type="time"
+                  value={sleep.bed_time}
+                  onChange={(e) => setSleep(prev => ({ ...prev, bed_time: e.target.value }))}
+                  className="w-full glass-input text-xs font-bold text-center"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-bold text-zinc-400 block uppercase">Wake Time</label>
+                <input
+                  type="time"
+                  value={sleep.wake_time}
+                  onChange={(e) => setSleep(prev => ({ ...prev, wake_time: e.target.value }))}
+                  className="w-full glass-input text-xs font-bold text-center"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-zinc-400 block uppercase">Sleep Quality</label>
+              <select
+                value={sleep.quality}
+                onChange={(e) => setSleep(prev => ({ ...prev, quality: e.target.value }))}
+                className="w-full glass-input text-xs font-bold cursor-pointer"
+              >
+                <option value="Excellent" className="bg-zinc-900 text-zinc-100">Excellent (Felt amazing)</option>
+                <option value="Good" className="bg-zinc-900 text-zinc-100">Good (Rested)</option>
+                <option value="Fair" className="bg-zinc-900 text-zinc-100">Fair (Slightly tired)</option>
+                <option value="Poor" className="bg-zinc-900 text-zinc-100">Poor (Exhausted)</option>
+              </select>
+            </div>
+
+            {sleep.bed_time && sleep.wake_time && (
+              <div className="p-3.5 rounded-xl bg-indigo-950/20 border border-indigo-500/20 text-xs flex justify-between text-indigo-300 font-bold">
+                <span>Calculated Duration:</span>
+                <span>{sleepHours} Hours / 8 Target</span>
+              </div>
+            )}
+
+            <div className="text-[10px] text-zinc-500 leading-relaxed">
+              Target 8 hours of sleep. Most muscle growth hormone is secreted during deep REM sleep stages.
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+}

@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { initDatabase } from './db.js';
 import apiRouter from './routes.js';
+import gymRouter from './gymRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -24,6 +25,7 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Serve API routes
 app.use('/api', apiRouter);
+app.use('/api/gym', gymRouter);
 
 // Serve Static Frontend files in production
 const frontendDistPath = path.join(__dirname, '../frontend/dist');
