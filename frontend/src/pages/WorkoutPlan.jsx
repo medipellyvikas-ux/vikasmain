@@ -375,29 +375,29 @@ export default function WorkoutPlan() {
     <div className="space-y-6">
       
       {/* Header Splitting Navigation */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 glass-panel p-6 rounded-2xl border border-zinc-800/80">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-800/80">
         <div>
           <span className="text-xs font-bold uppercase tracking-widest text-cyber-400 block mb-1">Workout Planner</span>
-          <h2 className="text-2xl font-black text-zinc-100 flex items-center gap-2">
+          <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 flex items-center gap-2">
             <Dumbbell className="w-6 h-6 text-fitgreen-400" />
             {WEEKDAYS[selectedDayIndex].name}: {activeFocus}
           </h2>
         </div>
 
         {/* Day selection slider */}
-        <div className="flex items-center gap-1.5 bg-zinc-900/60 p-1.5 rounded-xl border border-zinc-800/80">
+        <div className="flex items-center gap-1.5 bg-slate-150/80 dark:bg-slate-900/60 p-1.5 rounded-xl border border-slate-200 dark:border-slate-800/80">
           <button 
             onClick={() => setSelectedDayIndex(prev => (prev === 0 ? 6 : prev - 1))}
-            className="p-1 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 rounded-lg transition-colors"
+            className="p-1 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:bg-slate-800 rounded-lg transition-colors"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
-          <span className="text-xs font-bold text-zinc-200 px-3 min-w-[100px] text-center">
+          <span className="text-xs font-bold text-slate-700 dark:text-slate-200 px-3 min-w-[100px] text-center">
             {WEEKDAYS[selectedDayIndex].name}
           </span>
           <button 
             onClick={() => setSelectedDayIndex(prev => (prev === 6 ? 0 : prev + 1))}
-            className="p-1 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 rounded-lg transition-colors"
+            className="p-1 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:bg-slate-800 rounded-lg transition-colors"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
@@ -407,19 +407,19 @@ export default function WorkoutPlan() {
       {/* Routine Detail/Logger Panel */}
       {activeFocus === 'Outdoor Jogging' ? (
         /* Sunday Card Logger */
-        <div className="glass-panel p-8 rounded-3xl border border-zinc-800/80 max-w-xl mx-auto">
+        <div className="glass-panel p-8 rounded-3xl border border-slate-200 dark:border-slate-800/80 max-w-xl mx-auto">
           <div className="flex flex-col items-center mb-6">
             <div className="bg-cyber-950/20 p-4 rounded-full border border-cyber-500/20 text-cyber-400 mb-4 shadow-neon-blue">
               <Milestone className="w-8 h-8" />
             </div>
-            <h3 className="text-xl font-bold text-zinc-100">Sunday Outdoor Jogging</h3>
-            <p className="text-xs text-zinc-400 mt-1 text-center">Track your distance, duration, and cardiovascular progress.</p>
+            <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100">Sunday Outdoor Jogging</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 text-center">Track your distance, duration, and cardiovascular progress.</p>
           </div>
 
           <form onSubmit={handleSaveJog} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-zinc-400 block">Distance (km)</label>
+                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block">Distance (km)</label>
                 <input
                   type="number"
                   step="0.01"
@@ -431,7 +431,7 @@ export default function WorkoutPlan() {
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-zinc-400 block">Duration (Minutes)</label>
+                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block">Duration (Minutes)</label>
                 <input
                   type="number"
                   step="0.5"
@@ -445,7 +445,7 @@ export default function WorkoutPlan() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-zinc-400 block">Session Notes</label>
+              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block">Session Notes</label>
               <textarea
                 value={jogNotes}
                 onChange={(e) => setJogNotes(e.target.value)}
@@ -483,9 +483,9 @@ export default function WorkoutPlan() {
                   <Play className="w-4 h-4" /> Start Workout Timer
                 </button>
               ) : (
-                <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-800/80 px-4 py-2 rounded-xl text-xs">
+                <div className="flex items-center gap-3 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 px-4 py-2 rounded-xl text-xs">
                   <Timer className="w-4 h-4 text-cyber-400 animate-pulse" />
-                  <span className="font-mono font-bold text-zinc-200">{formatDuration(workoutDuration)}</span>
+                  <span className="font-mono font-bold text-slate-700 dark:text-slate-200">{formatDuration(workoutDuration)}</span>
                 </div>
               )}
             </div>
@@ -508,16 +508,16 @@ export default function WorkoutPlan() {
               const pr = personalRecords[ex.id] || 0;
 
               return (
-                <div key={ex.id} className="glass-panel p-6 rounded-2xl border border-zinc-800/60 space-y-4">
+                <div key={ex.id} className="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-800/60 space-y-4">
                   
                   {/* Header */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-900 pb-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-250 dark:border-slate-900 pb-3">
                     <div>
-                      <h3 className="font-black text-lg text-zinc-100">{ex.name}</h3>
-                      <span className="text-xs text-zinc-400 mt-0.5">{ex.muscle_group} • {ex.difficulty}</span>
+                      <h3 className="font-black text-lg text-slate-800 dark:text-slate-100">{ex.name}</h3>
+                      <span className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{ex.muscle_group} • {ex.difficulty}</span>
                     </div>
 
-                    <div className="flex items-center gap-4 text-xs font-bold text-zinc-400">
+                    <div className="flex items-center gap-4 text-xs font-bold text-slate-500 dark:text-slate-400">
                       <div>
                         Volume Lifted: <span className="text-fitgreen-400">{vol} kg</span>
                       </div>
@@ -532,7 +532,7 @@ export default function WorkoutPlan() {
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse min-w-[450px]">
                       <thead>
-                        <tr className="text-[10px] uppercase tracking-wider text-zinc-500 border-b border-zinc-900">
+                        <tr className="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-550 border-b border-slate-250 dark:border-slate-900">
                           <th className="py-2 w-16 text-center">Set</th>
                           <th className="py-2 w-32">Weight (kg)</th>
                           <th className="py-2 w-32">Reps</th>
@@ -544,18 +544,18 @@ export default function WorkoutPlan() {
                         {sets.map((s, index) => (
                           <tr 
                             key={index} 
-                            className={`border-b border-zinc-900/40 text-xs transition-colors ${
-                              s.completed ? 'bg-fitgreen-950/5 text-zinc-300' : ''
+                            className={`border-b border-slate-200/50 dark:border-slate-900/40 text-xs transition-colors ${
+                              s.completed ? 'bg-fitgreen-950/5 text-slate-700 dark:text-slate-300' : ''
                             }`}
                           >
-                            <td className="py-2.5 font-bold text-center text-zinc-400">{s.set_no}</td>
+                            <td className="py-2.5 font-bold text-center text-slate-500 dark:text-slate-400">{s.set_no}</td>
                             <td className="py-2.5 pr-2">
                               <input
                                 type="number"
                                 value={s.weight}
                                 onChange={(e) => handleSetChange(ex.id, index, 'weight', e.target.value)}
                                 disabled={s.completed}
-                                className="w-24 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-lg px-2.5 py-1 text-center focus:outline-none focus:border-cyber-500 disabled:opacity-50 disabled:border-transparent"
+                                className="w-24 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 rounded-lg px-2.5 py-1 text-center focus:outline-none focus:border-cyber-500 disabled:opacity-50 disabled:border-transparent"
                               />
                             </td>
                             <td className="py-2.5 pr-2">
@@ -564,7 +564,7 @@ export default function WorkoutPlan() {
                                 value={s.reps}
                                 onChange={(e) => handleSetChange(ex.id, index, 'reps', e.target.value)}
                                 disabled={s.completed}
-                                className="w-24 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-lg px-2.5 py-1 text-center focus:outline-none focus:border-cyber-500 disabled:opacity-50 disabled:border-transparent"
+                                className="w-24 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 rounded-lg px-2.5 py-1 text-center focus:outline-none focus:border-cyber-500 disabled:opacity-50 disabled:border-transparent"
                               />
                             </td>
                             <td className="py-2.5 text-center">
@@ -572,8 +572,8 @@ export default function WorkoutPlan() {
                                 onClick={() => handleToggleCompleted(ex.id, index)}
                                 className={`w-6 h-6 rounded-lg border flex items-center justify-center mx-auto transition-all ${
                                   s.completed 
-                                    ? 'bg-fitgreen-500 border-fitgreen-500 text-zinc-950' 
-                                    : 'border-zinc-700 hover:border-zinc-500 text-transparent'
+                                    ? 'bg-fitgreen-500 border-fitgreen-500 text-slate-950 dark:text-slate-50' 
+                                    : 'border-slate-300 dark:border-slate-700 hover:border-zinc-500 text-transparent'
                                 }`}
                               >
                                 <Check className="w-4 h-4 stroke-[3]" />
@@ -582,7 +582,7 @@ export default function WorkoutPlan() {
                             <td className="py-2.5 text-right">
                               <button
                                 onClick={() => handleDeleteSet(ex.id, index)}
-                                className="p-1 text-zinc-600 hover:text-red-400 rounded-md transition-colors"
+                                className="p-1 text-slate-500 dark:text-slate-500 hover:text-red-400 rounded-md transition-colors"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>
@@ -597,7 +597,7 @@ export default function WorkoutPlan() {
                   <div className="flex flex-col sm:flex-row gap-3 pt-2">
                     <button
                       onClick={() => handleAddSet(ex.id)}
-                      className="px-4 py-2 border border-zinc-800 hover:bg-zinc-900/60 text-zinc-400 hover:text-zinc-200 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all w-full sm:w-auto"
+                      className="px-4 py-2 border border-slate-200 dark:border-slate-800 hover:bg-slate-150/80 dark:bg-slate-900/60 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all w-full sm:w-auto"
                     >
                       <Plus className="w-4 h-4" /> Add Set
                     </button>

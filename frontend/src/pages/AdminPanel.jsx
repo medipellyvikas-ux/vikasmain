@@ -143,22 +143,22 @@ export default function AdminPanel() {
     <div className="space-y-6">
       
       {/* Header Panel */}
-      <div className="glass-panel p-6 rounded-2xl border border-zinc-800/80">
+      <div className="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-800/80">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <span className="text-xs font-bold uppercase tracking-widest text-purple-400 block mb-1">Administrative Terminal</span>
-            <h2 className="text-2xl font-black text-zinc-100 flex items-center gap-2">
+            <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 flex items-center gap-2">
               <Shield className="w-6 h-6 text-purple-500" />
               AeroFit Controls
             </h2>
           </div>
 
           {/* Navigation Tabs */}
-          <div className="flex bg-zinc-900/60 p-1 rounded-xl border border-zinc-800/80 text-xs font-bold shrink-0">
+          <div className="flex bg-slate-150/80 dark:bg-slate-900/60 p-1 rounded-xl border border-slate-200 dark:border-slate-800/80 text-xs font-bold shrink-0">
             <button
               onClick={() => setActiveTab('metrics')}
               className={`px-4 py-2 rounded-lg flex items-center gap-1.5 transition-colors ${
-                activeTab === 'metrics' ? 'bg-purple-600 text-white' : 'text-zinc-400 hover:text-zinc-200'
+                activeTab === 'metrics' ? 'bg-purple-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-200'
               }`}
             >
               <BarChart3 className="w-4 h-4" /> System Metrics
@@ -166,7 +166,7 @@ export default function AdminPanel() {
             <button
               onClick={() => setActiveTab('users')}
               className={`px-4 py-2 rounded-lg flex items-center gap-1.5 transition-colors ${
-                activeTab === 'users' ? 'bg-purple-600 text-white' : 'text-zinc-400 hover:text-zinc-200'
+                activeTab === 'users' ? 'bg-purple-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-200'
               }`}
             >
               <Users className="w-4 h-4" /> Users List
@@ -174,7 +174,7 @@ export default function AdminPanel() {
             <button
               onClick={() => setActiveTab('add_ex')}
               className={`px-4 py-2 rounded-lg flex items-center gap-1.5 transition-colors ${
-                activeTab === 'add_ex' ? 'bg-purple-600 text-white' : 'text-zinc-400 hover:text-zinc-200'
+                activeTab === 'add_ex' ? 'bg-purple-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:text-slate-200'
               }`}
             >
               <PlusCircle className="w-4 h-4" /> Add Exercise
@@ -192,29 +192,29 @@ export default function AdminPanel() {
         /* System Metrics Tab */
         <div className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div className="glass-panel p-5 rounded-2xl border border-zinc-800/60 text-center">
-              <span className="text-xs font-bold text-zinc-500 uppercase block">Registered Users</span>
-              <span className="text-3xl font-black text-zinc-100 mt-2 block">{reports.totalUsers} Members</span>
+            <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 text-center">
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-550 uppercase block">Registered Users</span>
+              <span className="text-3xl font-black text-slate-800 dark:text-slate-100 mt-2 block">{reports.totalUsers} Members</span>
             </div>
-            <div className="glass-panel p-5 rounded-2xl border border-zinc-800/60 text-center">
-              <span className="text-xs font-bold text-zinc-500 uppercase block">Completed Workouts</span>
-              <span className="text-3xl font-black text-zinc-100 mt-2 block">{reports.totalWorkouts} Workouts</span>
+            <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 text-center">
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-550 uppercase block">Completed Workouts</span>
+              <span className="text-3xl font-black text-slate-800 dark:text-slate-100 mt-2 block">{reports.totalWorkouts} Workouts</span>
             </div>
-            <div className="glass-panel p-5 rounded-2xl border border-zinc-800/60 text-center">
-              <span className="text-xs font-bold text-zinc-500 uppercase block">Exercise Logs Captured</span>
-              <span className="text-3xl font-black text-zinc-100 mt-2 block">{reports.totalLogs} Logs</span>
+            <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 text-center">
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-550 uppercase block">Exercise Logs Captured</span>
+              <span className="text-3xl font-black text-slate-800 dark:text-slate-100 mt-2 block">{reports.totalLogs} Logs</span>
             </div>
           </div>
 
-          <div className="glass-panel p-6 rounded-3xl border border-zinc-800/80 max-w-xl mx-auto space-y-4">
-            <h3 className="font-extrabold text-sm text-zinc-200 uppercase tracking-wider">Top Selections</h3>
+          <div className="glass-panel p-6 rounded-3xl border border-slate-200 dark:border-slate-800/80 max-w-xl mx-auto space-y-4">
+            <h3 className="font-extrabold text-sm text-slate-700 dark:text-slate-200 uppercase tracking-wider">Top Selections</h3>
             <div className="space-y-2.5">
               {reports.popularExercises.length === 0 ? (
-                <div className="text-center py-6 text-zinc-500 text-xs italic">No workout logs captured yet.</div>
+                <div className="text-center py-6 text-slate-500 dark:text-slate-550 text-xs italic">No workout logs captured yet.</div>
               ) : (
                 reports.popularExercises.map((item, idx) => (
-                  <div key={idx} className="flex justify-between items-center bg-zinc-900/40 border border-zinc-800/60 p-3 rounded-xl text-xs">
-                    <span className="font-bold text-zinc-200">{item.name}</span>
+                  <div key={idx} className="flex justify-between items-center bg-slate-100/60 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/60 p-3 rounded-xl text-xs">
+                    <span className="font-bold text-slate-700 dark:text-slate-200">{item.name}</span>
                     <span className="text-[10px] uppercase font-bold text-purple-400 border border-purple-500/20 bg-purple-950/20 px-2.5 py-1 rounded-lg">
                       Logged {item.count} times
                     </span>
@@ -226,8 +226,8 @@ export default function AdminPanel() {
         </div>
       ) : activeTab === 'users' ? (
         /* Users list Management Tab */
-        <div className="glass-panel p-6 rounded-3xl border border-zinc-800/80 overflow-hidden">
-          <h3 className="font-extrabold text-lg text-zinc-100 mb-4 flex items-center gap-2">
+        <div className="glass-panel p-6 rounded-3xl border border-slate-200 dark:border-slate-800/80 overflow-hidden">
+          <h3 className="font-extrabold text-lg text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
             <Users className="w-5 h-5 text-purple-400" />
             Manage Accounts
           </h3>
@@ -235,7 +235,7 @@ export default function AdminPanel() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[700px]">
               <thead>
-                <tr className="text-[10px] uppercase tracking-wider text-zinc-500 border-b border-zinc-900">
+                <tr className="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-550 border-b border-slate-250 dark:border-slate-900">
                   <th className="py-2.5">User</th>
                   <th className="py-2.5">Email</th>
                   <th className="py-2.5">Age</th>
@@ -247,20 +247,20 @@ export default function AdminPanel() {
               <tbody>
                 {usersList.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="py-6 text-center text-zinc-500 text-xs italic">No users registered in database.</td>
+                    <td colSpan="6" className="py-6 text-center text-slate-500 dark:text-slate-550 text-xs italic">No users registered in database.</td>
                   </tr>
                 ) : (
                   usersList.map(item => (
-                    <tr key={item.id} className="border-b border-zinc-900/40 text-xs">
-                      <td className="py-3 font-bold text-zinc-200">{item.name}</td>
-                      <td className="py-3 text-zinc-400">{item.email}</td>
-                      <td className="py-3 text-zinc-400">{item.age}</td>
-                      <td className="py-3 text-zinc-400">{item.height} cm / {item.weight} kg</td>
-                      <td className="py-3 text-zinc-400">{item.fitness_goal}</td>
+                    <tr key={item.id} className="border-b border-slate-200/50 dark:border-slate-900/40 text-xs">
+                      <td className="py-3 font-bold text-slate-700 dark:text-slate-200">{item.name}</td>
+                      <td className="py-3 text-slate-500 dark:text-slate-400">{item.email}</td>
+                      <td className="py-3 text-slate-500 dark:text-slate-400">{item.age}</td>
+                      <td className="py-3 text-slate-500 dark:text-slate-400">{item.height} cm / {item.weight} kg</td>
+                      <td className="py-3 text-slate-500 dark:text-slate-400">{item.fitness_goal}</td>
                       <td className="py-3 text-right">
                         <button
                           onClick={() => handleDeleteUser(item.id)}
-                          className="p-1.5 hover:bg-red-950/20 text-zinc-500 hover:text-red-400 rounded-lg transition-colors"
+                          className="p-1.5 hover:bg-red-950/20 text-slate-500 dark:text-slate-550 hover:text-red-400 rounded-lg transition-colors"
                           title="Delete User"
                         >
                           <Trash2 className="w-4.5 h-4.5" />
@@ -275,15 +275,15 @@ export default function AdminPanel() {
         </div>
       ) : (
         /* Create Exercise Tab */
-        <div className="glass-panel p-6 rounded-3xl border border-zinc-800/80 max-w-2xl mx-auto">
-          <h3 className="font-extrabold text-lg text-zinc-100 mb-4 flex items-center gap-2">
+        <div className="glass-panel p-6 rounded-3xl border border-slate-200 dark:border-slate-800/80 max-w-2xl mx-auto">
+          <h3 className="font-extrabold text-lg text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
             <Dumbbell className="w-5 h-5 text-purple-400" />
             Append to Muscle Library
           </h3>
 
           <form onSubmit={handleCreateExercise} className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-zinc-400 block">Exercise Name</label>
+              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block">Exercise Name</label>
               <input
                 type="text"
                 value={exName}
@@ -296,34 +296,34 @@ export default function AdminPanel() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-zinc-400 block">Muscle Group</label>
+                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block">Muscle Group</label>
                 <select
                   value={exMuscle}
                   onChange={(e) => setExMuscle(e.target.value)}
                   className="w-full glass-input text-xs cursor-pointer font-bold"
                 >
                   {['Chest', 'Back', 'Legs', 'Shoulders', 'Triceps', 'Biceps', 'Core', 'Mobility', 'Cardio'].map(m => (
-                    <option key={m} value={m} className="bg-zinc-900">{m}</option>
+                    <option key={m} value={m} className="bg-slate-100 dark:bg-slate-900">{m}</option>
                   ))}
                 </select>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-zinc-400 block">Difficulty</label>
+                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block">Difficulty</label>
                 <select
                   value={exDifficulty}
                   onChange={(e) => setExDifficulty(e.target.value)}
                   className="w-full glass-input text-xs cursor-pointer font-bold"
                 >
-                  <option value="Beginner" className="bg-zinc-900">Beginner</option>
-                  <option value="Intermediate" className="bg-zinc-900">Intermediate</option>
-                  <option value="Advanced" className="bg-zinc-900">Advanced</option>
+                  <option value="Beginner" className="bg-slate-100 dark:bg-slate-900">Beginner</option>
+                  <option value="Intermediate" className="bg-slate-100 dark:bg-slate-900">Intermediate</option>
+                  <option value="Advanced" className="bg-slate-100 dark:bg-slate-900">Advanced</option>
                 </select>
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-zinc-400 block">Instructions (One step per line)</label>
+              <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block">Instructions (One step per line)</label>
               <textarea
                 value={exInstText}
                 onChange={(e) => setExInstText(e.target.value)}
@@ -335,7 +335,7 @@ export default function AdminPanel() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-zinc-400 block">Common Mistakes (One per line)</label>
+                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block">Common Mistakes (One per line)</label>
                 <textarea
                   value={exMistakeText}
                   onChange={(e) => setExMistakeText(e.target.value)}
@@ -345,7 +345,7 @@ export default function AdminPanel() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-zinc-400 block">Safety Tips (One per line)</label>
+                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block">Safety Tips (One per line)</label>
                 <textarea
                   value={exSafetyText}
                   onChange={(e) => setExSafetyText(e.target.value)}
@@ -355,7 +355,7 @@ export default function AdminPanel() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-zinc-400 block">Beginner Tips (One per line)</label>
+                <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block">Beginner Tips (One per line)</label>
                 <textarea
                   value={exBeginnerText}
                   onChange={(e) => setExBeginnerText(e.target.value)}

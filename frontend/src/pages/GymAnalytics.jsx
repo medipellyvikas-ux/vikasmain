@@ -216,9 +216,9 @@ export default function Analytics() {
     <div className="space-y-6">
       
       {/* Header Panel */}
-      <div className="glass-panel p-6 rounded-2xl border border-zinc-800/80">
+      <div className="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-800/80">
         <span className="text-xs font-bold uppercase tracking-widest text-cyber-400 block mb-1">Performance Analytics</span>
-        <h2 className="text-2xl font-black text-zinc-100 flex items-center gap-2">
+        <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 flex items-center gap-2">
           <Activity className="w-6 h-6 text-fitgreen-500" />
           Fitness Trends & Progress Curves
         </h2>
@@ -228,13 +228,13 @@ export default function Analytics() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         
         {/* Weight trend chart */}
-        <div className="glass-panel p-6 rounded-3xl border border-zinc-800/80 space-y-4">
+        <div className="glass-panel p-6 rounded-3xl border border-slate-200 dark:border-slate-800/80 space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="font-extrabold text-sm text-zinc-200 flex items-center gap-2">
+            <h3 className="font-extrabold text-sm text-slate-700 dark:text-slate-200 flex items-center gap-2">
               <Scale className="w-4 h-4 text-cyber-400" />
               Weight Loss Curve
             </h3>
-            <span className="text-[10px] bg-zinc-900 border border-zinc-800 text-zinc-400 px-2.5 py-1 rounded-lg">Last 30 Logs</span>
+            <span className="text-[10px] bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 px-2.5 py-1 rounded-lg">Last 30 Logs</span>
           </div>
           <div className="h-64 relative">
             <Line data={getWeightData()} options={chartOptions} />
@@ -242,9 +242,9 @@ export default function Analytics() {
         </div>
 
         {/* Protein Intake Trend */}
-        <div className="glass-panel p-6 rounded-3xl border border-zinc-800/80 space-y-4">
+        <div className="glass-panel p-6 rounded-3xl border border-slate-200 dark:border-slate-800/80 space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="font-extrabold text-sm text-zinc-200 flex items-center gap-2">
+            <h3 className="font-extrabold text-sm text-slate-700 dark:text-slate-200 flex items-center gap-2">
               <Apple className="w-4 h-4 text-fitgreen-400" />
               Daily Protein Consumed
             </h3>
@@ -256,9 +256,9 @@ export default function Analytics() {
         </div>
 
         {/* Water Intake Trend */}
-        <div className="glass-panel p-6 rounded-3xl border border-zinc-800/80 space-y-4">
+        <div className="glass-panel p-6 rounded-3xl border border-slate-200 dark:border-slate-800/80 space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="font-extrabold text-sm text-zinc-200 flex items-center gap-2">
+            <h3 className="font-extrabold text-sm text-slate-700 dark:text-slate-200 flex items-center gap-2">
               <Droplet className="w-4 h-4 text-sky-400" />
               Daily Water Intake
             </h3>
@@ -270,13 +270,13 @@ export default function Analytics() {
         </div>
 
         {/* Muscle group split Doughnut */}
-        <div className="glass-panel p-6 rounded-3xl border border-zinc-800/80 space-y-4">
+        <div className="glass-panel p-6 rounded-3xl border border-slate-200 dark:border-slate-800/80 space-y-4">
           <div className="flex justify-between items-center">
-            <h3 className="font-extrabold text-sm text-zinc-200 flex items-center gap-2">
+            <h3 className="font-extrabold text-sm text-slate-700 dark:text-slate-200 flex items-center gap-2">
               <Award className="w-4 h-4 text-purple-400" />
               Muscle Group Balance
             </h3>
-            <span className="text-[10px] bg-zinc-900 border border-zinc-800 text-zinc-400 px-2.5 py-1 rounded-lg">Volume Breakdown</span>
+            <span className="text-[10px] bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 px-2.5 py-1 rounded-lg">Volume Breakdown</span>
           </div>
           <div className="h-64 relative flex items-center justify-center">
             <Doughnut data={getMuscleData()} options={doughnutOptions} />

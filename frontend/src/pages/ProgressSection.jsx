@@ -161,10 +161,10 @@ export default function ProgressSection() {
     <div className="space-y-6">
       
       {/* Header date picker panel */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-panel p-6 rounded-2xl border border-zinc-800/80">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-800/80">
         <div>
           <span className="text-xs font-bold uppercase tracking-widest text-cyber-400 block mb-1">Body Transformation Tracker</span>
-          <h2 className="text-2xl font-black text-zinc-100 flex items-center gap-2">
+          <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 flex items-center gap-2">
             <Activity className="w-6 h-6 text-cyber-500" />
             Measurements & Progress Photos
           </h2>
@@ -185,9 +185,9 @@ export default function ProgressSection() {
         
         {/* Left column: Measurements log + Photo boxes */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="glass-panel p-6 rounded-3xl border border-zinc-800/80 space-y-6">
-            <div className="flex justify-between items-center border-b border-zinc-900 pb-3">
-              <h3 className="font-extrabold text-lg text-zinc-100">Log Dimensions</h3>
+          <div className="glass-panel p-6 rounded-3xl border border-slate-200 dark:border-slate-800/80 space-y-6">
+            <div className="flex justify-between items-center border-b border-slate-250 dark:border-slate-900 pb-3">
+              <h3 className="font-extrabold text-lg text-slate-800 dark:text-slate-100">Log Dimensions</h3>
               <button
                 onClick={handleSaveProgress}
                 className="px-4 py-2 bg-cyber-600 hover:bg-cyber-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 transition-all shadow-lg"
@@ -207,7 +207,7 @@ export default function ProgressSection() {
                 { label: 'Thighs (cm)', val: thighs, set: setThighs, placeholder: 'e.g. 52' },
               ].map(item => (
                 <div key={item.label} className="space-y-1.5">
-                  <label className="text-xs font-bold text-zinc-400 block">{item.label}</label>
+                  <label className="text-xs font-bold text-slate-500 dark:text-slate-400 block">{item.label}</label>
                   <input
                     type="number"
                     step="0.1"
@@ -221,18 +221,18 @@ export default function ProgressSection() {
             </div>
 
             {/* Photo Boxes */}
-            <div className="border-t border-zinc-900 pt-5 space-y-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-zinc-400 block">Progress Photos</span>
+            <div className="border-t border-slate-250 dark:border-slate-900 pt-5 space-y-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">Progress Photos</span>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 
                 {/* Front Photo */}
                 <div className="space-y-2">
-                  <span className="text-[10px] font-bold text-zinc-500 block text-center uppercase">Front Posture</span>
-                  <div className="h-44 border-2 border-dashed border-zinc-800 rounded-2xl relative overflow-hidden bg-zinc-900/40 flex items-center justify-center">
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-550 block text-center uppercase">Front Posture</span>
+                  <div className="h-44 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl relative overflow-hidden bg-slate-100/60 dark:bg-slate-900/40 flex items-center justify-center">
                     {photoFront ? (
                       <img src={photoFront} alt="Front View" className="w-full h-full object-cover" />
                     ) : (
-                      <label className="flex flex-col items-center justify-center cursor-pointer text-zinc-500 hover:text-zinc-400 transition-colors w-full h-full">
+                      <label className="flex flex-col items-center justify-center cursor-pointer text-slate-500 dark:text-slate-550 hover:text-slate-500 dark:text-slate-400 transition-colors w-full h-full">
                         <Camera className="w-6 h-6 mb-2" />
                         <span className="text-[10px] font-semibold">Upload Photo</span>
                         <input type="file" accept="image/*" onChange={(e) => handlePhotoUpload(e, 'front')} className="hidden" />
@@ -243,12 +243,12 @@ export default function ProgressSection() {
 
                 {/* Side Photo */}
                 <div className="space-y-2">
-                  <span className="text-[10px] font-bold text-zinc-500 block text-center uppercase">Side Profile</span>
-                  <div className="h-44 border-2 border-dashed border-zinc-800 rounded-2xl relative overflow-hidden bg-zinc-900/40 flex items-center justify-center">
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-550 block text-center uppercase">Side Profile</span>
+                  <div className="h-44 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl relative overflow-hidden bg-slate-100/60 dark:bg-slate-900/40 flex items-center justify-center">
                     {photoSide ? (
                       <img src={photoSide} alt="Side View" className="w-full h-full object-cover" />
                     ) : (
-                      <label className="flex flex-col items-center justify-center cursor-pointer text-zinc-500 hover:text-zinc-400 transition-colors w-full h-full">
+                      <label className="flex flex-col items-center justify-center cursor-pointer text-slate-500 dark:text-slate-550 hover:text-slate-500 dark:text-slate-400 transition-colors w-full h-full">
                         <Camera className="w-6 h-6 mb-2" />
                         <span className="text-[10px] font-semibold">Upload Photo</span>
                         <input type="file" accept="image/*" onChange={(e) => handlePhotoUpload(e, 'side')} className="hidden" />
@@ -259,12 +259,12 @@ export default function ProgressSection() {
 
                 {/* Back Photo */}
                 <div className="space-y-2">
-                  <span className="text-[10px] font-bold text-zinc-500 block text-center uppercase">Back Posture</span>
-                  <div className="h-44 border-2 border-dashed border-zinc-800 rounded-2xl relative overflow-hidden bg-zinc-900/40 flex items-center justify-center">
+                  <span className="text-[10px] font-bold text-slate-500 dark:text-slate-550 block text-center uppercase">Back Posture</span>
+                  <div className="h-44 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl relative overflow-hidden bg-slate-100/60 dark:bg-slate-900/40 flex items-center justify-center">
                     {photoBack ? (
                       <img src={photoBack} alt="Back View" className="w-full h-full object-cover" />
                     ) : (
-                      <label className="flex flex-col items-center justify-center cursor-pointer text-zinc-500 hover:text-zinc-400 transition-colors w-full h-full">
+                      <label className="flex flex-col items-center justify-center cursor-pointer text-slate-500 dark:text-slate-550 hover:text-slate-500 dark:text-slate-400 transition-colors w-full h-full">
                         <Camera className="w-6 h-6 mb-2" />
                         <span className="text-[10px] font-semibold">Upload Photo</span>
                         <input type="file" accept="image/*" onChange={(e) => handlePhotoUpload(e, 'back')} className="hidden" />
@@ -281,8 +281,8 @@ export default function ProgressSection() {
 
         {/* Right column: Before vs After side-by-side comparison */}
         <div className="space-y-6">
-          <div className="glass-panel p-6 rounded-3xl border border-zinc-800/80 space-y-5">
-            <h3 className="font-extrabold text-lg text-zinc-100 flex items-center gap-2">
+          <div className="glass-panel p-6 rounded-3xl border border-slate-200 dark:border-slate-800/80 space-y-5">
+            <h3 className="font-extrabold text-lg text-slate-800 dark:text-slate-100 flex items-center gap-2">
               <History className="w-5 h-5 text-fitgreen-400" />
               Before vs. Current
             </h3>
@@ -292,28 +292,28 @@ export default function ProgressSection() {
                 {/* Select log dropdowns */}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <span className="text-[9px] font-bold text-zinc-500 uppercase">Before Date</span>
+                    <span className="text-[9px] font-bold text-slate-500 dark:text-slate-550 uppercase">Before Date</span>
                     <select
                       value={selectedBeforeId}
                       onChange={(e) => setSelectedBeforeId(e.target.value)}
                       className="w-full glass-input text-xs font-bold py-1.5"
                     >
                       {history.map(h => (
-                        <option key={h.id} value={h.id.toString()} className="bg-zinc-900 text-zinc-200">
+                        <option key={h.id} value={h.id.toString()} className="bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-200">
                           {h.date}
                         </option>
                       ))}
                     </select>
                   </div>
                   <div className="space-y-1">
-                    <span className="text-[9px] font-bold text-zinc-500 uppercase">Current Date</span>
+                    <span className="text-[9px] font-bold text-slate-500 dark:text-slate-550 uppercase">Current Date</span>
                     <select
                       value={selectedCurrentId}
                       onChange={(e) => setSelectedCurrentId(e.target.value)}
                       className="w-full glass-input text-xs font-bold py-1.5"
                     >
                       {history.map(h => (
-                        <option key={h.id} value={h.id.toString()} className="bg-zinc-900 text-zinc-200">
+                        <option key={h.id} value={h.id.toString()} className="bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-200">
                           {h.date}
                         </option>
                       ))}
@@ -322,7 +322,7 @@ export default function ProgressSection() {
                 </div>
 
                 {/* Deltas display list */}
-                <div className="space-y-2 border-t border-zinc-900 pt-4">
+                <div className="space-y-2 border-t border-slate-250 dark:border-slate-900 pt-4">
                   {[
                     { label: 'Weight Change', key: 'weight', unit: 'kg' },
                     { label: 'Waist Delta', key: 'waist', unit: 'cm' },
@@ -337,11 +337,11 @@ export default function ProgressSection() {
                     const isPos = delta.startsWith('+');
                     return (
                       <div key={stat.key} className="flex justify-between items-center text-xs py-1">
-                        <span className="text-zinc-400 font-medium">{stat.label}</span>
+                        <span className="text-slate-500 dark:text-slate-400 font-medium">{stat.label}</span>
                         <span className={`font-black ${
                           isPos && stat.key !== 'waist' ? 'text-fitgreen-400' :
                           isNeg && stat.key === 'waist' ? 'text-fitgreen-400' :
-                          delta === '0' ? 'text-zinc-500' : 'text-cyber-400'
+                          delta === '0' ? 'text-slate-500 dark:text-slate-550' : 'text-cyber-400'
                         }`}>
                           {delta}
                         </span>
@@ -352,15 +352,15 @@ export default function ProgressSection() {
 
                 {/* Image side by side */}
                 {beforeLog && currentLog && (beforeLog.photo_front || currentLog.photo_front) && (
-                  <div className="border-t border-zinc-900 pt-4 space-y-2">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 block text-center">Front Comparison</span>
+                  <div className="border-t border-slate-250 dark:border-slate-900 pt-4 space-y-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block text-center">Front Comparison</span>
                     <div className="grid grid-cols-2 gap-2">
-                      <div className="h-32 rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900/30 flex items-center justify-center text-[10px] text-zinc-500">
+                      <div className="h-32 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100/40 dark:bg-slate-900/30 flex items-center justify-center text-[10px] text-slate-500 dark:text-slate-550">
                         {beforeLog.photo_front ? (
                           <img src={beforeLog.photo_front} alt="Before" className="w-full h-full object-cover" />
                         ) : 'No photo'}
                       </div>
-                      <div className="h-32 rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900/30 flex items-center justify-center text-[10px] text-zinc-500">
+                      <div className="h-32 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100/40 dark:bg-slate-900/30 flex items-center justify-center text-[10px] text-slate-500 dark:text-slate-550">
                         {currentLog.photo_front ? (
                           <img src={currentLog.photo_front} alt="Current" className="w-full h-full object-cover" />
                         ) : 'No photo'}
@@ -370,7 +370,7 @@ export default function ProgressSection() {
                 )}
               </div>
             ) : (
-              <div className="text-center py-8 text-xs text-zinc-500 italic border border-dashed border-zinc-800/80 rounded-2xl">
+              <div className="text-center py-8 text-xs text-slate-500 dark:text-slate-550 italic border border-dashed border-slate-200 dark:border-slate-800/80 rounded-2xl">
                 Need at least 2 logged progress dates to compute before vs. current deltas.
               </div>
             )}

@@ -200,10 +200,10 @@ export default function NutritionTracker() {
     <div className="space-y-6">
       
       {/* Date selector header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-panel p-6 rounded-2xl border border-zinc-800/80">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-800/80">
         <div>
           <span className="text-xs font-bold uppercase tracking-widest text-fitgreen-400 block mb-1">Nutrition & Recovery Trackers</span>
-          <h2 className="text-2xl font-black text-zinc-100 flex items-center gap-2">
+          <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 flex items-center gap-2">
             <Apple className="w-6 h-6 text-fitgreen-500" />
             Daily Fuel Logger
           </h2>
@@ -224,9 +224,9 @@ export default function NutritionTracker() {
         
         {/* Left Side: Food logger items (2 cols) */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="glass-panel p-6 rounded-3xl border border-zinc-800/80 space-y-6">
-            <div className="flex justify-between items-center border-b border-zinc-900 pb-3">
-              <h3 className="font-extrabold text-lg text-zinc-100 flex items-center gap-2">
+          <div className="glass-panel p-6 rounded-3xl border border-slate-200 dark:border-slate-800/80 space-y-6">
+            <div className="flex justify-between items-center border-b border-slate-250 dark:border-slate-900 pb-3">
+              <h3 className="font-extrabold text-lg text-slate-800 dark:text-slate-100 flex items-center gap-2">
                 <UtensilsCrossed className="w-5 h-5 text-fitgreen-400" />
                 Track Foods
               </h3>
@@ -243,10 +243,10 @@ export default function NutritionTracker() {
               {NUTRITION_ITEMS.map(item => {
                 const loggedVal = log[item.key] || 0;
                 return (
-                  <div key={item.key} className="p-4 rounded-2xl bg-zinc-900/40 border border-zinc-800/60 flex items-center justify-between">
+                  <div key={item.key} className="p-4 rounded-2xl bg-slate-100/60 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/60 flex items-center justify-between">
                     <div>
-                      <span className="block font-bold text-zinc-200 text-sm">{item.name}</span>
-                      <span className="block text-[10px] text-zinc-500 mt-0.5">
+                      <span className="block font-bold text-slate-700 dark:text-slate-200 text-sm">{item.name}</span>
+                      <span className="block text-[10px] text-slate-500 dark:text-slate-550 mt-0.5">
                         {item.unit === 'Grams' ? `100g portion` : item.unit === 'ml' ? `100ml portion` : `1 portion`}
                         {' '}• {item.protein}g protein
                       </span>
@@ -256,16 +256,16 @@ export default function NutritionTracker() {
                       <button
                         onClick={() => handleUpdateItem(item.key, item.unit === 'Grams' || item.unit === 'ml' ? -50 : -1)}
                         disabled={loggedVal === 0}
-                        className="w-7 h-7 bg-zinc-900 border border-zinc-800 text-zinc-400 disabled:opacity-40 disabled:pointer-events-none rounded-lg flex items-center justify-center hover:bg-zinc-800 transition-colors"
+                        className="w-7 h-7 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 disabled:opacity-40 disabled:pointer-events-none rounded-lg flex items-center justify-center hover:bg-slate-200 dark:bg-slate-800 transition-colors"
                       >
                         <Minus className="w-3.5 h-3.5" />
                       </button>
-                      <span className="w-16 text-center font-bold text-sm text-zinc-200">
-                        {loggedVal} <span className="text-[10px] text-zinc-500 font-normal">{item.unit === 'Grams' || item.unit === 'ml' ? item.unit : ''}</span>
+                      <span className="w-16 text-center font-bold text-sm text-slate-700 dark:text-slate-200">
+                        {loggedVal} <span className="text-[10px] text-slate-500 dark:text-slate-550 font-normal">{item.unit === 'Grams' || item.unit === 'ml' ? item.unit : ''}</span>
                       </span>
                       <button
                         onClick={() => handleUpdateItem(item.key, item.unit === 'Grams' || item.unit === 'ml' ? 50 : 1)}
-                        className="w-7 h-7 bg-zinc-900 border border-zinc-800 text-zinc-400 rounded-lg flex items-center justify-center hover:bg-zinc-800 transition-colors"
+                        className="w-7 h-7 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 rounded-lg flex items-center justify-center hover:bg-slate-200 dark:bg-slate-800 transition-colors"
                       >
                         <Plus className="w-3.5 h-3.5" />
                       </button>
@@ -276,8 +276,8 @@ export default function NutritionTracker() {
             </div>
 
             {/* Custom food entry */}
-            <div className="border-t border-zinc-900 pt-5 space-y-3">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 block">Quick Log Other Foods</span>
+            <div className="border-t border-slate-250 dark:border-slate-900 pt-5 space-y-3">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">Quick Log Other Foods</span>
               <div className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="number"
@@ -295,7 +295,7 @@ export default function NutritionTracker() {
                 />
                 <button
                   onClick={handleAddCustom}
-                  className="px-4 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all border border-zinc-800/80"
+                  className="px-4 py-2.5 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all border border-slate-200 dark:border-slate-800/80"
                 >
                   <PlusCircle className="w-4 h-4 text-cyber-400" /> Add Custom
                 </button>
@@ -309,16 +309,16 @@ export default function NutritionTracker() {
         <div className="space-y-6">
           
           {/* Targets breakdown summary card */}
-          <div className="glass-panel p-6 rounded-3xl border border-zinc-800/80 space-y-5">
-            <h3 className="font-extrabold text-lg text-zinc-100">Nutrition Targets</h3>
+          <div className="glass-panel p-6 rounded-3xl border border-slate-200 dark:border-slate-800/80 space-y-5">
+            <h3 className="font-extrabold text-lg text-slate-800 dark:text-slate-100">Nutrition Targets</h3>
             
             {/* Protein bar */}
             <div className="space-y-2">
               <div className="flex justify-between text-xs font-bold">
-                <span className="text-zinc-400">Total Protein</span>
+                <span className="text-slate-500 dark:text-slate-400">Total Protein</span>
                 <span className="text-fitgreen-400">{totalProtein}g / 120g</span>
               </div>
-              <div className="h-3 w-full bg-zinc-900 rounded-full overflow-hidden border border-zinc-800/50">
+              <div className="h-3 w-full bg-slate-100 dark:bg-slate-900 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800/50">
                 <div 
                   className="h-full bg-gradient-to-r from-fitgreen-600 to-fitgreen-400 transition-all duration-500 rounded-full"
                   style={{ width: `${proteinPercent}%` }}
@@ -329,12 +329,12 @@ export default function NutritionTracker() {
             {/* Calories count */}
             <div className="space-y-2">
               <div className="flex justify-between text-xs font-bold">
-                <span className="text-zinc-400">Est. Total Calories</span>
+                <span className="text-slate-500 dark:text-slate-400">Est. Total Calories</span>
                 <span className="text-cyber-400">{totalCalories} kcal</span>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-zinc-900/40 border border-zinc-800/60 text-[10px] text-zinc-500 leading-relaxed">
+            <div className="p-4 rounded-xl bg-slate-100/60 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/60 text-[10px] text-slate-500 dark:text-slate-550 leading-relaxed">
               <div className="flex gap-2 items-start">
                 <Heart className="w-4 h-4 text-fitgreen-400 shrink-0 mt-0.5" />
                 <span>
@@ -345,9 +345,9 @@ export default function NutritionTracker() {
           </div>
 
           {/* Sleep logger card */}
-          <div className="glass-panel p-6 rounded-3xl border border-zinc-800/80 space-y-4">
-            <div className="flex justify-between items-center border-b border-zinc-900 pb-3">
-              <h3 className="font-extrabold text-lg text-zinc-100 flex items-center gap-2">
+          <div className="glass-panel p-6 rounded-3xl border border-slate-200 dark:border-slate-800/80 space-y-4">
+            <div className="flex justify-between items-center border-b border-slate-250 dark:border-slate-900 pb-3">
+              <h3 className="font-extrabold text-lg text-slate-800 dark:text-slate-100 flex items-center gap-2">
                 <Moon className="w-5 h-5 text-indigo-400" />
                 Log Sleep
               </h3>
@@ -361,7 +361,7 @@ export default function NutritionTracker() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-zinc-400 block uppercase">Bed Time</label>
+                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block uppercase">Bed Time</label>
                 <input
                   type="time"
                   value={sleep.bed_time}
@@ -370,7 +370,7 @@ export default function NutritionTracker() {
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[10px] font-bold text-zinc-400 block uppercase">Wake Time</label>
+                <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block uppercase">Wake Time</label>
                 <input
                   type="time"
                   value={sleep.wake_time}
@@ -381,16 +381,16 @@ export default function NutritionTracker() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-zinc-400 block uppercase">Sleep Quality</label>
+              <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 block uppercase">Sleep Quality</label>
               <select
                 value={sleep.quality}
                 onChange={(e) => setSleep(prev => ({ ...prev, quality: e.target.value }))}
                 className="w-full glass-input text-xs font-bold cursor-pointer"
               >
-                <option value="Excellent" className="bg-zinc-900 text-zinc-100">Excellent (Felt amazing)</option>
-                <option value="Good" className="bg-zinc-900 text-zinc-100">Good (Rested)</option>
-                <option value="Fair" className="bg-zinc-900 text-zinc-100">Fair (Slightly tired)</option>
-                <option value="Poor" className="bg-zinc-900 text-zinc-100">Poor (Exhausted)</option>
+                <option value="Excellent" className="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100">Excellent (Felt amazing)</option>
+                <option value="Good" className="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100">Good (Rested)</option>
+                <option value="Fair" className="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100">Fair (Slightly tired)</option>
+                <option value="Poor" className="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100">Poor (Exhausted)</option>
               </select>
             </div>
 
@@ -401,7 +401,7 @@ export default function NutritionTracker() {
               </div>
             )}
 
-            <div className="text-[10px] text-zinc-500 leading-relaxed">
+            <div className="text-[10px] text-slate-500 dark:text-slate-550 leading-relaxed">
               Target 8 hours of sleep. Most muscle growth hormone is secreted during deep REM sleep stages.
             </div>
           </div>

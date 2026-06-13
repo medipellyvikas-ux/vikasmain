@@ -116,9 +116,9 @@ export default function Gamification() {
     <div className="space-y-6">
       
       {/* Header Panel */}
-      <div className="glass-panel p-6 rounded-2xl border border-zinc-800/80">
+      <div className="glass-panel p-6 rounded-2xl border border-slate-200 dark:border-slate-800/80">
         <span className="text-xs font-bold uppercase tracking-widest text-fitgreen-400 block mb-1">Milestones & Achievements</span>
-        <h2 className="text-2xl font-black text-zinc-100 flex items-center gap-2">
+        <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 flex items-center gap-2">
           <Trophy className="w-6 h-6 text-yellow-500" />
           AeroFit Badge Cabinet
         </h2>
@@ -126,20 +126,20 @@ export default function Gamification() {
 
       {/* Stats Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="glass-panel p-5 rounded-2xl border border-zinc-800/60 text-center">
-          <span className="text-xs font-bold text-zinc-500 uppercase block">Total Badges</span>
-          <span className="text-4xl font-black text-zinc-100 block mt-2">{unlockedBadges.length} / 8</span>
-          <span className="text-[10px] text-zinc-400 block mt-1">Unlocked Milestones</span>
+        <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 text-center">
+          <span className="text-xs font-bold text-slate-500 dark:text-slate-550 uppercase block">Total Badges</span>
+          <span className="text-4xl font-black text-slate-800 dark:text-slate-100 block mt-2">{unlockedBadges.length} / 8</span>
+          <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-1">Unlocked Milestones</span>
         </div>
-        <div className="glass-panel p-5 rounded-2xl border border-zinc-800/60 text-center">
-          <span className="text-xs font-bold text-zinc-500 uppercase block">Next Target</span>
+        <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 text-center">
+          <span className="text-xs font-bold text-slate-500 dark:text-slate-550 uppercase block">Next Target</span>
           <span className="text-lg font-black text-cyber-400 block mt-3 uppercase tracking-wider">7-Day Streak</span>
-          <span className="text-[10px] text-zinc-500 block mt-1">Consistency pays off</span>
+          <span className="text-[10px] text-slate-500 dark:text-slate-550 block mt-1">Consistency pays off</span>
         </div>
-        <div className="glass-panel p-5 rounded-2xl border border-zinc-800/60 text-center">
-          <span className="text-xs font-bold text-zinc-500 uppercase block">Profile Tier</span>
+        <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 text-center">
+          <span className="text-xs font-bold text-slate-500 dark:text-slate-550 uppercase block">Profile Tier</span>
           <span className="text-lg font-black text-fitgreen-400 block mt-3 uppercase tracking-wider">Beginner Iron</span>
-          <span className="text-[10px] text-zinc-500 block mt-1">Level 1 Fitness Enthusiast</span>
+          <span className="text-[10px] text-slate-500 dark:text-slate-550 block mt-1">Level 1 Fitness Enthusiast</span>
         </div>
       </div>
 
@@ -155,8 +155,8 @@ export default function Gamification() {
               onClick={() => handleBadgeClick(badge.name, isUnlocked)}
               className={`glass-panel p-6 rounded-3xl border text-center flex flex-col items-center justify-between cursor-pointer transition-all duration-300 relative group overflow-hidden ${
                 isUnlocked
-                  ? 'border-fitgreen-500/30 hover:border-fitgreen-400/50 hover:bg-zinc-900/30'
-                  : 'border-zinc-800/60 opacity-60 hover:opacity-80'
+                  ? 'border-fitgreen-500/30 hover:border-fitgreen-400/50 hover:bg-slate-100/40 dark:bg-slate-900/30'
+                  : 'border-slate-200 dark:border-slate-800/60 opacity-60 hover:opacity-80'
               }`}
             >
               {/* Highlight radial glow for unlocked badges */}
@@ -168,39 +168,39 @@ export default function Gamification() {
               <div className="relative mb-4">
                 <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg transform transition-transform duration-300 group-hover:rotate-6 ${
                   isUnlocked
-                    ? `bg-gradient-to-tr ${badge.color} text-zinc-950 shadow-fitgreen-500/20`
-                    : 'bg-zinc-900 border border-zinc-800 text-zinc-600'
+                    ? `bg-gradient-to-tr ${badge.color} text-slate-950 dark:text-slate-50 shadow-fitgreen-500/20`
+                    : 'bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-500'
                 }`}>
                   <Icon className="w-8 h-8" />
                 </div>
                 
                 {/* Lock Overlay */}
                 {!isUnlocked && (
-                  <div className="absolute -bottom-1.5 -right-1.5 bg-zinc-950 border border-zinc-800 p-1 rounded-md text-zinc-500 shadow-md">
+                  <div className="absolute -bottom-1.5 -right-1.5 bg-slate-50 dark:bg-navy-950 border border-slate-200 dark:border-slate-800 p-1 rounded-md text-slate-500 dark:text-slate-550 shadow-md">
                     <Lock className="w-3.5 h-3.5" />
                   </div>
                 )}
                 {isUnlocked && (
-                  <div className="absolute -bottom-1.5 -right-1.5 bg-fitgreen-500 border border-zinc-950 p-0.5 rounded-full text-zinc-950 shadow-md">
-                    <CheckCircle2 className="w-3.5 h-3.5 fill-fitgreen-500 text-zinc-950" />
+                  <div className="absolute -bottom-1.5 -right-1.5 bg-fitgreen-500 border border-zinc-950 p-0.5 rounded-full text-slate-950 dark:text-slate-50 shadow-md">
+                    <CheckCircle2 className="w-3.5 h-3.5 fill-fitgreen-500 text-slate-950 dark:text-slate-50" />
                   </div>
                 )}
               </div>
 
               {/* Text */}
               <div className="space-y-1">
-                <h4 className={`font-black text-sm ${isUnlocked ? 'text-zinc-100' : 'text-zinc-500'}`}>
+                <h4 className={`font-black text-sm ${isUnlocked ? 'text-slate-800 dark:text-slate-100' : 'text-slate-500 dark:text-slate-550'}`}>
                   {badge.name}
                 </h4>
-                <p className="text-[11px] text-zinc-400 leading-normal min-h-[32px] flex items-center justify-center">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-normal min-h-[32px] flex items-center justify-center">
                   {badge.description}
                 </p>
               </div>
 
               {/* Unlock State Badge */}
-              <div className="mt-4 pt-3 border-t border-zinc-900/60 w-full">
+              <div className="mt-4 pt-3 border-t border-slate-250 dark:border-slate-900/60 w-full">
                 <span className={`text-[9px] uppercase font-black tracking-widest ${
-                  isUnlocked ? 'text-fitgreen-400' : 'text-zinc-600'
+                  isUnlocked ? 'text-fitgreen-400' : 'text-slate-500 dark:text-slate-500'
                 }`}>
                   {isUnlocked ? 'Unlocked' : 'Locked'}
                 </span>
