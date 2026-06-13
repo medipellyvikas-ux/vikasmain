@@ -587,7 +587,7 @@ export function Dashboard({ data, user, transactions }) {
       {/* Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Wallet Balance */}
-        <div className="glass-panel p-5 rounded-3xl shadow-premium dark:bg-navy-900/60 flex flex-col justify-between hover-card-trigger">
+        <div className="glass-panel p-5 rounded-3xl shadow-premium dark:bg-navy-900/60 flex flex-col justify-between hover-card-trigger bg-gradient-to-tr from-brand-500/5 to-teal-500/5 dark:from-brand-950/10 dark:to-teal-950/10 border border-slate-200 dark:border-slate-800/60 shadow-brand-500/5">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Wallet Balance</span>
             <div className={`p-2 rounded-xl ${isBalanceLow ? 'bg-rose-500/10 text-rose-500' : 'bg-brand-500/10 text-brand-600'}`}>
@@ -598,12 +598,12 @@ export function Dashboard({ data, user, transactions }) {
             <div className={`text-2xl font-bold tracking-tight ${isBalanceLow ? 'text-rose-500' : 'text-slate-800 dark:text-white'}`}>
               {formatCurrency(data.walletBalance)}
             </div>
-            <span className="text-xs text-slate-400 font-medium">Contributions - Expenses</span>
+            <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">Contributions - Expenses</span>
           </div>
         </div>
 
         {/* This Month Expenses */}
-        <div className="glass-panel p-5 rounded-3xl shadow-premium dark:bg-navy-900/60 flex flex-col justify-between hover-card-trigger">
+        <div className="glass-panel p-5 rounded-3xl shadow-premium dark:bg-navy-900/60 flex flex-col justify-between hover-card-trigger bg-gradient-to-tr from-violet-500/5 to-fuchsia-500/5 dark:from-violet-950/10 dark:to-fuchsia-950/10 border border-slate-200 dark:border-slate-800/60 shadow-violet-500/5">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">This Month Expenses</span>
             <div className="p-2 rounded-xl bg-violet-500/10 text-violet-500">
@@ -614,12 +614,12 @@ export function Dashboard({ data, user, transactions }) {
             <div className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
               {formatCurrency(data.thisMonthExpenses)}
             </div>
-            <span className="text-xs text-slate-400 font-medium">Expenses for {new Date().toLocaleString('default', { month: 'long' })}</span>
+            <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">Expenses for {new Date().toLocaleString('default', { month: 'long' })}</span>
           </div>
         </div>
 
         {/* Today's Expenses */}
-        <div className="glass-panel p-5 rounded-3xl shadow-premium dark:bg-navy-900/60 flex flex-col justify-between hover-card-trigger">
+        <div className="glass-panel p-5 rounded-3xl shadow-premium dark:bg-navy-900/60 flex flex-col justify-between hover-card-trigger bg-gradient-to-tr from-amber-500/5 to-orange-500/5 dark:from-amber-950/10 dark:to-orange-950/10 border border-slate-200 dark:border-slate-800/60 shadow-amber-500/5">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Today's Expenses</span>
             <div className="p-2 rounded-xl bg-amber-500/10 text-amber-500">
@@ -630,12 +630,12 @@ export function Dashboard({ data, user, transactions }) {
             <div className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
               {formatCurrency(data.todayExpenses)}
             </div>
-            <span className="text-xs text-slate-400 font-medium">Spent today</span>
+            <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">Spent today</span>
           </div>
         </div>
 
         {/* Active Transactions */}
-        <div className="glass-panel p-5 rounded-3xl shadow-premium dark:bg-navy-900/60 flex flex-col justify-between hover-card-trigger">
+        <div className="glass-panel p-5 rounded-3xl shadow-premium dark:bg-navy-900/60 flex flex-col justify-between hover-card-trigger bg-gradient-to-tr from-cyan-500/5 to-sky-500/5 dark:from-cyan-950/10 dark:to-sky-950/10 border border-slate-200 dark:border-slate-800/60 shadow-cyan-500/5">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Transactions Count</span>
             <div className="p-2 rounded-xl bg-cyan-500/10 text-cyan-500">
@@ -646,7 +646,7 @@ export function Dashboard({ data, user, transactions }) {
             <div className="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">
               {data.transactionCount}
             </div>
-            <span className="text-xs text-slate-400 font-medium">Active this month</span>
+            <span className="text-xs text-slate-400 dark:text-slate-500 font-medium">Active this month</span>
           </div>
         </div>
       </div>
@@ -705,7 +705,7 @@ export function Dashboard({ data, user, transactions }) {
             <div className="h-[220px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={memberContributionsData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.08)" vertical={false} />
                   <XAxis dataKey="name" stroke="#94a3b8" fontSize={10} tickLine={false} />
                   <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} width={30} domain={[0, maxContribution > 0 ? 'auto' : 1000]} />
                   <Tooltip formatter={(value) => formatCurrency(value)} cursor={{ fill: 'transparent' }} />
@@ -738,7 +738,7 @@ export function Dashboard({ data, user, transactions }) {
                       <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.08)" vertical={false} />
                   <XAxis dataKey="month" stroke="#94a3b8" fontSize={10} tickLine={false} />
                   <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} width={30} domain={[0, maxTrendAmount > 0 ? 'auto' : 1000]} />
                   <Tooltip formatter={(value) => formatCurrency(value)} />

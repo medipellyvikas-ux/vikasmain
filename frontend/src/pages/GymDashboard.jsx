@@ -174,13 +174,13 @@ export default function GymDashboard({ onNavigate }) {
     <div className="space-y-6">
       
       {/* Personalized Greeting */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 glass-panel p-6 md:p-8 rounded-3xl border border-zinc-800/80">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 glass-panel p-6 md:p-8 rounded-3xl border border-slate-200 dark:border-slate-800/80 bg-gradient-to-r from-cyber-500/5 to-fitgreen-500/5 dark:from-cyber-950/10 dark:to-fitgreen-950/10">
         <div>
-          <span className="text-xs font-bold uppercase tracking-widest text-cyber-400 block mb-1">Personalized Dashboard</span>
-          <h2 className="text-3xl font-black tracking-tight text-zinc-100">
-            Welcome Back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyber-400 to-fitgreen-400">{user?.name}</span>
+          <span className="text-xs font-bold uppercase tracking-widest text-cyber-500 dark:text-cyber-400 block mb-1">Personalized Dashboard</span>
+          <h2 className="text-3xl font-black tracking-tight text-slate-800 dark:text-slate-100">
+            Welcome Back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyber-500 to-fitgreen-500 dark:from-cyber-400 dark:to-fitgreen-400">{user?.name}</span>
           </h2>
-          <p className="text-sm text-zinc-400 mt-1">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             26-year-old Beginner • {user?.height} cm (5'7") • {user?.weight} kg (73 kg starting) • goal: {user?.fitness_goal}
           </p>
         </div>
@@ -196,69 +196,69 @@ export default function GymDashboard({ onNavigate }) {
       {/* Main Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Weight Card */}
-        <div className="glass-panel p-5 rounded-2xl border border-zinc-800/60 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-zinc-400">
+        <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 flex flex-col justify-between hover-card-trigger shadow-premium dark:shadow-premium-dark shadow-emerald-500/5">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
             <span className="text-xs font-bold uppercase tracking-wider">Weight Goal</span>
-            <Scale className="w-5 h-5 text-cyber-400" />
+            <Scale className="w-5 h-5 text-cyber-500 dark:text-cyber-400" />
           </div>
           <div className="mt-4">
-            <span className="block text-2xl font-black text-zinc-100">{user?.weight} kg</span>
-            <span className="block text-[11px] text-zinc-500 mt-1">Target: {user?.target_weight} kg</span>
+            <span className="block text-2xl font-black text-slate-800 dark:text-slate-100">{user?.weight} kg</span>
+            <span className="block text-[11px] text-slate-500 dark:text-slate-400 mt-1">Target: {user?.target_weight} kg</span>
           </div>
-          <div className="mt-3 pt-3 border-t border-zinc-900 flex items-center justify-between text-[11px] text-fitgreen-400">
+          <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-fitgreen-500 dark:text-fitgreen-400">
             <span className="flex items-center gap-1 font-bold">
               <TrendingDown className="w-3.5 h-3.5" />
               {Math.max(0, Math.round((73 - user?.weight) * 10) / 10)} kg Lost
             </span>
-            <span className="text-zinc-500">since start</span>
+            <span className="text-slate-400 dark:text-slate-500">since start</span>
           </div>
         </div>
 
         {/* Workout Streak Card */}
-        <div className="glass-panel p-5 rounded-2xl border border-zinc-800/60 flex flex-col justify-between pulse-blue">
-          <div className="flex items-center justify-between text-zinc-400">
+        <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 flex flex-col justify-between hover-card-trigger shadow-premium dark:shadow-premium-dark shadow-orange-500/5 pulse-blue">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
             <span className="text-xs font-bold uppercase tracking-wider">Current Streak</span>
             <Flame className="w-5 h-5 text-orange-500" />
           </div>
           <div className="mt-4">
-            <span className="block text-2xl font-black text-zinc-100">{stats.streak} Days</span>
-            <span className="block text-[11px] text-zinc-500 mt-1">Consecutive Workouts</span>
+            <span className="block text-2xl font-black text-slate-800 dark:text-slate-100">{stats.streak} Days</span>
+            <span className="block text-[11px] text-slate-500 dark:text-slate-400 mt-1">Consecutive Workouts</span>
           </div>
-          <div className="mt-3 pt-3 border-t border-zinc-900 flex items-center justify-between text-[11px] text-cyber-400">
+          <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-cyber-500 dark:text-cyber-400">
             <span className="font-bold">Next badge: 7 Days</span>
-            <span className="text-zinc-500">{stats.streak}/7</span>
+            <span className="text-slate-400 dark:text-slate-500">{stats.streak}/7</span>
           </div>
         </div>
 
         {/* Workouts Completed Card */}
-        <div className="glass-panel p-5 rounded-2xl border border-zinc-800/60 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-zinc-400">
+        <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 flex flex-col justify-between hover-card-trigger shadow-premium dark:shadow-premium-dark shadow-yellow-500/5">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
             <span className="text-xs font-bold uppercase tracking-wider">Total Workouts</span>
             <Trophy className="w-5 h-5 text-yellow-500" />
           </div>
           <div className="mt-4">
-            <span className="block text-2xl font-black text-zinc-100">{stats.totalCompleted} Sessions</span>
-            <span className="block text-[11px] text-zinc-500 mt-1">Completed exercises</span>
+            <span className="block text-2xl font-black text-slate-800 dark:text-slate-100">{stats.totalCompleted} Sessions</span>
+            <span className="block text-[11px] text-slate-500 dark:text-slate-400 mt-1">Completed exercises</span>
           </div>
-          <div className="mt-3 pt-3 border-t border-zinc-900 flex items-center justify-between text-[11px] text-fitgreen-400">
+          <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-fitgreen-500 dark:text-fitgreen-400">
             <span className="font-bold">First Blood Unlocked</span>
-            <span className="text-zinc-500">100%</span>
+            <span className="text-slate-400 dark:text-slate-500">100%</span>
           </div>
         </div>
 
         {/* Calories Burned Card */}
-        <div className="glass-panel p-5 rounded-2xl border border-zinc-800/60 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-zinc-400">
+        <div className="glass-panel p-5 rounded-2xl border border-slate-200 dark:border-slate-800/60 flex flex-col justify-between hover-card-trigger shadow-premium dark:shadow-premium-dark shadow-red-500/5">
+          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
             <span className="text-xs font-bold uppercase tracking-wider">Est. Calories Burned</span>
             <Flame className="w-5 h-5 text-red-500" />
           </div>
           <div className="mt-4">
-            <span className="block text-2xl font-black text-zinc-100">{calculateCaloriesBurned()} kcal</span>
-            <span className="block text-[11px] text-zinc-500 mt-1">BMR + Workout energy</span>
+            <span className="block text-2xl font-black text-slate-800 dark:text-slate-100">{calculateCaloriesBurned()} kcal</span>
+            <span className="block text-[11px] text-slate-500 dark:text-slate-400 mt-1">BMR + Workout energy</span>
           </div>
-          <div className="mt-3 pt-3 border-t border-zinc-900 flex items-center justify-between text-[11px] text-zinc-500">
+          <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500">
             <span className="flex items-center gap-1">
-              <Info className="w-3 h-3 text-zinc-500" />
+              <Info className="w-3 h-3 text-slate-400 dark:text-slate-500" />
               Reset at midnight
             </span>
           </div>
@@ -269,13 +269,13 @@ export default function GymDashboard({ onNavigate }) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         {/* Nutrition Ring Card */}
-        <div className="glass-panel p-6 rounded-3xl border border-zinc-800/80 flex flex-col justify-between">
+        <div className="glass-panel p-6 rounded-3xl border border-slate-200 dark:border-slate-800/80 flex flex-col justify-between shadow-premium dark:shadow-premium-dark">
           <div>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-lg text-zinc-100">Protein Tracker</h3>
-              <Utensils className="w-5 h-5 text-fitgreen-400" />
+              <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">Protein Tracker</h3>
+              <Utensils className="w-5 h-5 text-fitgreen-500 dark:text-fitgreen-400" />
             </div>
-            <p className="text-xs text-zinc-400 mb-6">Muscle-building target: 120 grams daily</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">Muscle-building target: 120 grams daily</p>
           </div>
 
           <div className="flex flex-col items-center justify-center my-4 relative">
@@ -286,7 +286,7 @@ export default function GymDashboard({ onNavigate }) {
                 cy="72"
                 r="62"
                 strokeWidth="10"
-                stroke="#18181b"
+                className="stroke-slate-100 dark:stroke-slate-900"
                 fill="transparent"
               />
               <circle
@@ -308,23 +308,23 @@ export default function GymDashboard({ onNavigate }) {
               </defs>
             </svg>
             <div className="absolute flex flex-col items-center">
-              <span className="text-2xl font-black text-zinc-100">{todayProtein}g</span>
-              <span className="text-[10px] text-zinc-500 font-bold uppercase">of 120g</span>
+              <span className="text-2xl font-black text-slate-800 dark:text-slate-100">{todayProtein}g</span>
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase">of 120g</span>
             </div>
           </div>
 
           <div className="mt-6 space-y-3">
-            <div className="flex justify-between text-xs text-zinc-400">
+            <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
               <span>Calories Consumed</span>
-              <span className="font-bold text-zinc-100">{todayCalories} kcal</span>
+              <span className="font-bold text-slate-800 dark:text-slate-100">{todayCalories} kcal</span>
             </div>
-            <div className="flex justify-between text-xs text-zinc-400">
+            <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400">
               <span>Remaining Target</span>
-              <span className="font-bold text-fitgreen-400">{Math.max(0, 120 - todayProtein)}g Protein</span>
+              <span className="font-bold text-fitgreen-500 dark:text-fitgreen-400">{Math.max(0, 120 - todayProtein)}g Protein</span>
             </div>
             <button 
               onClick={() => onNavigate('nutrition')}
-              className="w-full text-center mt-3 block py-2.5 bg-zinc-900 hover:bg-zinc-800/80 text-zinc-300 hover:text-white rounded-xl text-xs font-bold transition-all border border-zinc-800/60"
+              className="w-full text-center mt-3 block py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-xl text-xs font-bold transition-all border border-slate-200 dark:border-slate-800/60"
             >
               Log Food Intake
             </button>
@@ -332,18 +332,18 @@ export default function GymDashboard({ onNavigate }) {
         </div>
 
         {/* Water Log Interactive Card */}
-        <div className="glass-panel p-6 rounded-3xl border border-zinc-800/80 flex flex-col justify-between">
+        <div className="glass-panel p-6 rounded-3xl border border-slate-200 dark:border-slate-800/80 flex flex-col justify-between shadow-premium dark:shadow-premium-dark">
           <div>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-lg text-zinc-100">Water Tracker</h3>
-              <Droplet className="w-5 h-5 text-cyber-400" />
+              <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">Water Tracker</h3>
+              <Droplet className="w-5 h-5 text-cyber-500 dark:text-cyber-400" />
             </div>
-            <p className="text-xs text-zinc-400 mb-6">Daily hydration target: 4.0 Litres</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">Daily hydration target: 4.0 Litres</p>
           </div>
 
           {/* Visual Cup Animation Container */}
           <div className="my-2 flex flex-col items-center justify-center">
-            <div className="w-24 h-36 border-4 border-zinc-800 rounded-b-2xl relative overflow-hidden bg-zinc-900/40">
+            <div className="w-24 h-36 border-4 border-slate-300 dark:border-slate-700 rounded-b-2xl relative overflow-hidden bg-slate-100 dark:bg-slate-900/40 shadow-inner">
               <div 
                 className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-cyber-600/70 to-cyber-400/80 transition-all duration-500"
                 style={{ height: `${waterProgressPercent}%` }}
@@ -352,55 +352,55 @@ export default function GymDashboard({ onNavigate }) {
                   <div className="absolute top-0 inset-x-0 h-2 bg-white/20 animate-pulse"></div>
                 )}
               </div>
-              <div className="absolute inset-0 flex items-center justify-center font-black text-xl text-zinc-100 drop-shadow-md">
+              <div className="absolute inset-0 flex items-center justify-center font-black text-xl text-slate-850 dark:text-slate-100 drop-shadow-md">
                 {waterProgressPercent}%
               </div>
             </div>
-            <span className="text-sm font-black mt-3 text-zinc-200">{todayWater} L / 4.0 L</span>
+            <span className="text-sm font-black mt-3 text-slate-700 dark:text-slate-200">{todayWater} L / 4.0 L</span>
           </div>
 
           <div className="mt-6 space-y-4">
             <div className="flex gap-2.5">
               <button
                 onClick={() => handleUpdateWater(0.25)}
-                className="flex-1 py-2.5 bg-cyber-950/20 hover:bg-cyber-900/30 text-cyber-400 border border-cyber-500/30 font-bold rounded-xl text-xs flex items-center justify-center gap-1 transition-all"
+                className="flex-1 py-2.5 bg-cyber-50 dark:bg-cyber-950/20 hover:bg-cyber-100 dark:hover:bg-cyber-900/30 text-cyber-600 dark:text-cyber-400 border border-cyber-200 dark:border-cyber-500/30 font-bold rounded-xl text-xs flex items-center justify-center gap-1 transition-all"
               >
                 <Plus className="w-3.5 h-3.5" /> 250 ml
               </button>
               <button
                 onClick={() => handleUpdateWater(0.5)}
-                className="flex-1 py-2.5 bg-cyber-950/20 hover:bg-cyber-900/30 text-cyber-400 border border-cyber-500/30 font-bold rounded-xl text-xs flex items-center justify-center gap-1 transition-all"
+                className="flex-1 py-2.5 bg-cyber-50 dark:bg-cyber-950/20 hover:bg-cyber-100 dark:hover:bg-cyber-900/30 text-cyber-600 dark:text-cyber-400 border border-cyber-200 dark:border-cyber-500/30 font-bold rounded-xl text-xs flex items-center justify-center gap-1 transition-all"
               >
                 <Plus className="w-3.5 h-3.5" /> 500 ml
               </button>
               <button
                 onClick={() => handleUpdateWater(-0.25)}
                 disabled={todayWater === 0}
-                className="py-2.5 px-3 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 disabled:opacity-40 disabled:pointer-events-none rounded-xl border border-zinc-800/80 transition-all"
+                className="py-2.5 px-3 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 disabled:opacity-40 disabled:pointer-events-none rounded-xl border border-slate-200 dark:border-slate-800/80 transition-all"
               >
                 <Minus className="w-3.5 h-3.5" />
               </button>
             </div>
-            <div className="text-center text-[10px] text-zinc-500">
+            <div className="text-center text-[10px] text-slate-450 dark:text-slate-500">
               Proper hydration accelerates protein digestion and muscle recovery.
             </div>
           </div>
         </div>
 
         {/* Sleep Target Card */}
-        <div className="glass-panel p-6 rounded-3xl border border-zinc-800/80 flex flex-col justify-between">
+        <div className="glass-panel p-6 rounded-3xl border border-slate-200 dark:border-slate-800/80 flex flex-col justify-between shadow-premium dark:shadow-premium-dark">
           <div>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-lg text-zinc-100">Sleep Tracker</h3>
-              <Moon className="w-5 h-5 text-indigo-400" />
+              <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">Sleep Tracker</h3>
+              <Moon className="w-5 h-5 text-indigo-450 dark:text-indigo-400" />
             </div>
-            <p className="text-xs text-zinc-400 mb-6">Target for muscle repair: 8.0 Hours</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">Target for muscle repair: 8.0 Hours</p>
           </div>
 
           <div className="my-4 flex flex-col items-center">
             <div className="relative flex items-center justify-center">
               <svg className="w-28 h-28 transform -rotate-90">
-                <circle cx="56" cy="56" r="48" strokeWidth="8" stroke="#18181b" fill="transparent" />
+                <circle cx="56" cy="56" r="48" strokeWidth="8" className="stroke-slate-100 dark:stroke-slate-900" fill="transparent" />
                 <circle 
                   cx="56" 
                   cy="56" 
@@ -414,8 +414,8 @@ export default function GymDashboard({ onNavigate }) {
                 />
               </svg>
               <div className="absolute flex flex-col items-center">
-                <span className="text-xl font-black text-zinc-100">{todaySleep.hours || 0} hrs</span>
-                <span className="text-[9px] text-zinc-500 font-bold uppercase">of 8 hrs</span>
+                <span className="text-xl font-black text-slate-800 dark:text-slate-100">{todaySleep.hours || 0} hrs</span>
+                <span className="text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase">of 8 hrs</span>
               </div>
             </div>
           </div>
@@ -423,28 +423,28 @@ export default function GymDashboard({ onNavigate }) {
           <div className="mt-6 space-y-3">
             {todaySleep.bed_time ? (
               <div className="space-y-2 text-xs">
-                <div className="flex justify-between text-zinc-400">
+                <div className="flex justify-between text-slate-500 dark:text-slate-400">
                   <span>Schedule:</span>
-                  <span className="font-semibold text-zinc-200">{todaySleep.bed_time} - {todaySleep.wake_time}</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">{todaySleep.bed_time} - {todaySleep.wake_time}</span>
                 </div>
-                <div className="flex justify-between text-zinc-400">
+                <div className="flex justify-between text-slate-500 dark:text-slate-400">
                   <span>Quality Index:</span>
                   <span className={`font-bold ${
-                    todaySleep.quality === 'Excellent' || todaySleep.quality === 'Good' ? 'text-fitgreen-400' : 'text-amber-400'
+                    todaySleep.quality === 'Excellent' || todaySleep.quality === 'Good' ? 'text-fitgreen-500 dark:text-fitgreen-400' : 'text-amber-500 dark:text-amber-400'
                   }`}>
                     {todaySleep.quality}
                   </span>
                 </div>
               </div>
             ) : (
-              <div className="text-center py-2 text-xs text-zinc-500 italic">
+              <div className="text-center py-2 text-xs text-slate-400 dark:text-slate-500 italic">
                 No sleep log recorded for today.
               </div>
             )}
             
             <button 
               onClick={() => onNavigate('nutrition')}
-              className="w-full text-center mt-3 block py-2.5 bg-zinc-900 hover:bg-zinc-800/80 text-zinc-300 hover:text-white rounded-xl text-xs font-bold transition-all border border-zinc-800/60"
+              className="w-full text-center mt-3 block py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-900 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-xl text-xs font-bold transition-all border border-slate-200 dark:border-slate-800/60"
             >
               Log Sleep Schedules
             </button>
@@ -457,13 +457,13 @@ export default function GymDashboard({ onNavigate }) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         {/* Monday to Sunday Workout Card */}
-        <div className="glass-panel p-6 rounded-3xl border border-zinc-800/80 md:col-span-2">
+        <div className="glass-panel p-6 rounded-3xl border border-slate-200 dark:border-slate-800/80 md:col-span-2 shadow-premium dark:shadow-premium-dark">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h3 className="font-bold text-lg text-zinc-100">Weekly Muscle-Building Routine</h3>
-              <p className="text-xs text-zinc-400 mt-1">Split template for beginner muscle gains</p>
+              <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">Weekly Muscle-Building Routine</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Split template for beginner muscle gains</p>
             </div>
-            <Calendar className="w-5 h-5 text-zinc-500" />
+            <Calendar className="w-5 h-5 text-slate-400 dark:text-slate-550" />
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5">
@@ -480,16 +480,16 @@ export default function GymDashboard({ onNavigate }) {
                 key={item.day} 
                 className={`p-3 rounded-xl border text-center flex flex-col justify-between h-24 transition-all duration-200 hover:-translate-y-0.5 ${
                   item.day === new Date().toLocaleDateString('en-US', { weekday: 'short' })
-                    ? 'border-cyber-500 bg-cyber-950/20 shadow-neon-blue'
-                    : 'border-zinc-800/60 bg-zinc-900/30'
+                    ? 'border-cyber-500 bg-cyber-50/50 dark:bg-cyber-950/20 shadow-neon-blue'
+                    : 'border-slate-200 dark:border-slate-800/60 bg-slate-100/40 dark:bg-slate-900/30'
                 }`}
               >
-                <span className="block text-[11px] font-black text-zinc-400 uppercase">{item.day}</span>
-                <span className="block text-[10px] text-zinc-500 mt-1 font-bold truncate">{item.focus}</span>
+                <span className="block text-[11px] font-black text-slate-400 dark:text-slate-500 uppercase">{item.day}</span>
+                <span className="block text-[10px] text-slate-750 dark:text-slate-405 mt-1 font-bold truncate">{item.focus}</span>
                 <span className={`text-[8px] uppercase font-extrabold px-1.5 py-0.5 rounded-full inline-block mx-auto mt-2 ${
-                  item.type === 'strength' ? 'bg-fitgreen-950/40 text-fitgreen-400 border border-fitgreen-500/20' :
-                  item.type === 'core' ? 'bg-purple-950/40 text-purple-400 border border-purple-500/20' :
-                  'bg-cyber-950/40 text-cyber-400 border border-cyber-500/20'
+                  item.type === 'strength' ? 'bg-fitgreen-50 dark:bg-fitgreen-950/40 text-fitgreen-600 dark:text-fitgreen-400 border border-fitgreen-200 dark:border-fitgreen-500/20' :
+                  item.type === 'core' ? 'bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-500/20' :
+                  'bg-cyber-50 dark:bg-cyber-950/40 text-cyber-600 dark:text-cyber-400 border border-cyber-200 dark:border-cyber-500/20'
                 }`}>
                   {item.type}
                 </span>
@@ -499,10 +499,10 @@ export default function GymDashboard({ onNavigate }) {
         </div>
 
         {/* Reminders / Notifications Quick Settings Card */}
-        <div className="glass-panel p-6 rounded-3xl border border-zinc-800/80 flex flex-col justify-between">
+        <div className="glass-panel p-6 rounded-3xl border border-slate-200 dark:border-slate-800/80 flex flex-col justify-between shadow-premium dark:shadow-premium-dark">
           <div>
-            <h3 className="font-bold text-lg text-zinc-100 mb-2">Simulated Schedules</h3>
-            <p className="text-xs text-zinc-400">Standard reminder presets configured for user</p>
+            <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100 mb-2">Simulated Schedules</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Standard reminder presets configured for user</p>
           </div>
 
           <div className="space-y-3 my-4">
@@ -512,20 +512,20 @@ export default function GymDashboard({ onNavigate }) {
               { time: '07:30 AM', label: 'Protein Target Alert', active: true },
               { time: 'Every 2h', label: 'Water Hydration Alert', active: true },
             ].map((rem, idx) => (
-              <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl bg-zinc-900/40 border border-zinc-800/60 text-xs">
+              <div key={idx} className="flex items-center justify-between p-2.5 rounded-xl bg-slate-100/50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/60 text-xs">
                 <div>
-                  <span className="block font-bold text-zinc-200">{rem.label}</span>
-                  <span className="block text-[10px] text-zinc-500 mt-0.5">{rem.time}</span>
+                  <span className="block font-bold text-slate-850 dark:text-slate-200">{rem.label}</span>
+                  <span className="block text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{rem.time}</span>
                 </div>
                 <span className="flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-fitgreen-400 animate-ping"></span>
-                  <span className="text-[10px] uppercase font-bold text-fitgreen-400">Active</span>
+                  <span className="w-2 h-2 rounded-full bg-fitgreen-500 dark:bg-fitgreen-400 animate-ping"></span>
+                  <span className="text-[10px] uppercase font-bold text-fitgreen-600 dark:text-fitgreen-400">Active</span>
                 </span>
               </div>
             ))}
           </div>
 
-          <div className="text-center text-[10px] text-zinc-500">
+          <div className="text-center text-[10px] text-slate-400 dark:text-slate-500">
             Reminders automatically raise browser-level alerts during schedules.
           </div>
         </div>
