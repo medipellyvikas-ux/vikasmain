@@ -61,21 +61,16 @@ export default function Analytics() {
     }
   };
 
-  // Helper to fill mock history if data is sparse, ensuring visual wow factor out of the box
   const getWeightData = () => {
     const dates = data.weightTrend.map(w => w.date);
     const weights = data.weightTrend.map(w => w.weight);
 
-    // Seed mock weight decline curve if empty
-    const finalDates = dates.length > 0 ? dates : ['May 29', 'May 30', 'May 31', 'Jun 01', 'Jun 02', 'Jun 03', 'Jun 04', 'Jun 05'];
-    const finalWeights = weights.length > 0 ? weights : [73.0, 72.8, 72.5, 72.4, 72.1, 71.9, 71.8, 71.5];
-
     return {
-      labels: finalDates,
+      labels: dates,
       datasets: [
         {
           label: 'Body Weight (kg)',
-          data: finalWeights,
+          data: weights,
           borderColor: '#3b82f6', // Cyber Blue
           backgroundColor: 'rgba(59, 130, 246, 0.05)',
           borderWidth: 3,
@@ -92,15 +87,12 @@ export default function Analytics() {
     const dates = data.proteinTrend.map(p => p.date);
     const proteins = data.proteinTrend.map(p => p.protein);
 
-    const finalDates = dates.length > 0 ? dates : ['May 30', 'May 31', 'Jun 01', 'Jun 02', 'Jun 03', 'Jun 04', 'Jun 05'];
-    const finalProteins = proteins.length > 0 ? proteins : [110, 125, 95, 120, 130, 115, 120];
-
     return {
-      labels: finalDates,
+      labels: dates,
       datasets: [
         {
           label: 'Protein Intake (g)',
-          data: finalProteins,
+          data: proteins,
           backgroundColor: '#10b981', // Fit Green
           borderRadius: 6,
           borderWidth: 0,
@@ -114,15 +106,12 @@ export default function Analytics() {
     const dates = data.waterTrend.map(w => w.date);
     const waters = data.waterTrend.map(w => w.amount_liters);
 
-    const finalDates = dates.length > 0 ? dates : ['May 30', 'May 31', 'Jun 01', 'Jun 02', 'Jun 03', 'Jun 04', 'Jun 05'];
-    const finalWaters = waters.length > 0 ? waters : [3.5, 4.0, 2.5, 4.2, 4.0, 3.8, 4.0];
-
     return {
-      labels: finalDates,
+      labels: dates,
       datasets: [
         {
           label: 'Water Volume (L)',
-          data: finalWaters,
+          data: waters,
           borderColor: '#60a5fa',
           backgroundColor: 'rgba(96, 165, 250, 0.15)',
           borderWidth: 2.5,
@@ -137,14 +126,11 @@ export default function Analytics() {
     const groups = data.muscleFreq.map(m => m.muscle_group);
     const counts = data.muscleFreq.map(m => parseInt(m.count));
 
-    const finalGroups = groups.length > 0 ? groups : ['Chest', 'Back', 'Legs', 'Shoulders', 'Triceps', 'Biceps', 'Core'];
-    const finalCounts = counts.length > 0 ? counts : [6, 5, 5, 5, 3, 3, 4];
-
     return {
-      labels: finalGroups,
+      labels: groups,
       datasets: [
         {
-          data: finalCounts,
+          data: counts,
           backgroundColor: [
             '#3b82f6',
             '#10b981',
@@ -155,7 +141,7 @@ export default function Analytics() {
             '#f43f5e'
           ],
           borderWidth: 1,
-          borderColor: '#18181b'
+          borderColor: document.documentElement.classList.contains('dark') ? '#18181b' : '#ffffff'
         }
       ]
     };
@@ -237,7 +223,18 @@ export default function Analytics() {
             <span className="text-[10px] bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 px-2.5 py-1 rounded-lg">Last 30 Logs</span>
           </div>
           <div className="h-64 relative">
-            <Line data={getWeightData()} options={chartOptions} />
+            {data.weightTrend.length > 0 ? (
+              <Line data={getWeightData()} options={chartOptions} />
+            ) : (
+              <div className="h-full w-full flex flex-col items-center justify-center text-center p-4 space-y-3">
+                <div className="p-4 bg-slate-100/50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/50 dark:border-slate-800/50 text-slate-400 dark:text-slate-500">
+                  <Scale className="w-8 h-8 text-cyber-400 animate-pulse" />
+                </div>
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400 max-w-[280px]">
+                  No weight records logged yet. Record your weight in the Body Progress tab.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -251,7 +248,18 @@ export default function Analytics() {
             <span className="text-[10px] text-fitgreen-400 font-bold border border-fitgreen-500/20 bg-fitgreen-950/20 px-2.5 py-1 rounded-lg">Target: 120g</span>
           </div>
           <div className="h-64 relative">
-            <Bar data={getProteinData()} options={chartOptions} />
+            {data.proteinTrend.length > 0 ? (
+              <Bar data={getProteinData()} options={chartOptions} />
+            ) : (
+              <div className="h-full w-full flex flex-col items-center justify-center text-center p-4 space-y-3">
+                <div className="p-4 bg-slate-100/50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/50 dark:border-slate-800/50 text-slate-400 dark:text-slate-500">
+                  <Apple className="w-8 h-8 text-fitgreen-400 animate-pulse" />
+                </div>
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400 max-w-[280px]">
+                  No protein logs recorded yet. Log your meals in the Nutrition Tracker.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -265,7 +273,18 @@ export default function Analytics() {
             <span className="text-[10px] text-sky-400 font-bold border border-sky-500/20 bg-sky-950/20 px-2.5 py-1 rounded-lg">Target: 4.0L</span>
           </div>
           <div className="h-64 relative">
-            <Line data={getWaterData()} options={chartOptions} />
+            {data.waterTrend.length > 0 ? (
+              <Line data={getWaterData()} options={chartOptions} />
+            ) : (
+              <div className="h-full w-full flex flex-col items-center justify-center text-center p-4 space-y-3">
+                <div className="p-4 bg-slate-100/50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/50 dark:border-slate-800/50 text-slate-400 dark:text-slate-500">
+                  <Droplet className="w-8 h-8 text-sky-400 animate-pulse" />
+                </div>
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400 max-w-[280px]">
+                  No water intake logged yet. Log your hydration on the Dashboard.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -279,7 +298,18 @@ export default function Analytics() {
             <span className="text-[10px] bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 px-2.5 py-1 rounded-lg">Volume Breakdown</span>
           </div>
           <div className="h-64 relative flex items-center justify-center">
-            <Doughnut data={getMuscleData()} options={doughnutOptions} />
+            {data.muscleFreq.length > 0 ? (
+              <Doughnut data={getMuscleData()} options={doughnutOptions} />
+            ) : (
+              <div className="h-full w-full flex flex-col items-center justify-center text-center p-4 space-y-3">
+                <div className="p-4 bg-slate-100/50 dark:bg-slate-900/50 rounded-2xl border border-slate-200/50 dark:border-slate-800/50 text-slate-400 dark:text-slate-500">
+                  <Activity className="w-8 h-8 text-purple-400 animate-pulse" />
+                </div>
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400 max-w-[280px]">
+                  No workouts completed yet. Log your completed sets in the Workout Plan.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
