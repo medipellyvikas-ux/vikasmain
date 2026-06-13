@@ -77,7 +77,7 @@ router.post('/auth/login', async (req, res) => {
     const token = jwt.sign(
       { id: user.id, username: user.username, role: user.role, name: user.name },
       JWT_SECRET,
-      { expiresIn: '7d' }
+      { expiresIn: '6h' }
     );
 
     await logAction(user.id, 'Login', `User ${user.username} logged in successfully`);

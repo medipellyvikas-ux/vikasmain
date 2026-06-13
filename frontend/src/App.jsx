@@ -86,9 +86,30 @@ export default function App() {
     fetchData();
   }, [token]);
 
+  // Auto-logout after 6 hours check
+  useEffect(() => {
+    if (!token) return;
+    
+    const checkSession = () => {
+      const loginTime = localStorage.getItem('loginTime');
+      if (loginTime) {
+        const elapsed = Date.now() - parseInt(loginTime);
+        const sixHours = 6 * 60 * 60 * 1000;
+        if (elapsed >= sixHours) {
+          handleLogout();
+        }
+      }
+    };
+    
+    checkSession();
+    const interval = setInterval(checkSession, 60000); // check every 1 minute
+    return () => clearInterval(interval);
+  }, [token]);
+
   const handleLogin = (newToken, loggedUser) => {
     localStorage.setItem('token', newToken);
     localStorage.setItem('user', JSON.stringify(loggedUser));
+    localStorage.setItem('loginTime', Date.now().toString());
     setToken(newToken);
     setUser(loggedUser);
     setActiveTab('dashboard');
@@ -97,6 +118,7 @@ export default function App() {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('loginTime');
     setToken('');
     setUser(null);
   };
