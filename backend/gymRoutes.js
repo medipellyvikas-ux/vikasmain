@@ -52,7 +52,7 @@ router.put('/user/profile', authenticateToken, async (req, res) => {
       );
     } else {
       await db.queryRun(
-        'INSERT INTO member_fitness_profiles (member_id, age, height, weight, target_weight, fitness_goal) VALUES (?, ?, ?, ?, ?, ?)',
+        'INSERT INTO member_fitness_profiles (member_id, age, height, weight, target_weight, fitness_goal) VALUES (?, ?, ?, ?, ?, ?) RETURNING member_id',
         [
           req.user.id,
           age ? parseInt(age) : 26,

@@ -400,7 +400,7 @@ export const initDatabase = async () => {
       if (!existingProfile) {
         const isUserAdmin = m.role === 'admin';
         await queryRun(
-          'INSERT INTO member_fitness_profiles (member_id, age, height, weight, target_weight, fitness_goal) VALUES (?, ?, ?, ?, ?, ?)',
+          'INSERT INTO member_fitness_profiles (member_id, age, height, weight, target_weight, fitness_goal) VALUES (?, ?, ?, ?, ?, ?) RETURNING member_id',
           [
             m.id,
             isUserAdmin ? 30 : 26,
