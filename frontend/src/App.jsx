@@ -55,17 +55,19 @@ export default function App() {
 
       // 1. Fetch settlements (contains summary stats)
       const resSet = await fetch('/api/settlements', { headers });
-      if (resSet.status === 401) return handleLogout();
+      if (resSet.status === 401 || resSet.status === 403) return handleLogout();
       const setRep = await resSet.json();
       setReport(setRep);
 
       // 2. Fetch all transactions
       const resTx = await fetch('/api/transactions', { headers });
+      if (resTx.status === 401 || resTx.status === 403) return handleLogout();
       const txs = await resTx.json();
       setTransactions(txs);
 
       // 3. Fetch all members
       const resMembers = await fetch('/api/members', { headers });
+      if (resMembers.status === 401 || resMembers.status === 403) return handleLogout();
       const membersData = await resMembers.json();
       setMembers(membersData);
 
