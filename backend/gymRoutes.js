@@ -315,7 +315,22 @@ router.get('/nutrition', authenticateToken, async (req, res) => {
     const log = await db.queryGet('SELECT * FROM nutrition_logs WHERE user_id = ? AND date = ?', [req.user.id, date]);
     if (!log) {
       return res.json({
-        eggs: 0, chicken: 0, fish: 0, milk: 0, curd: 0, paneer: 0, whey_protein: 0, custom_protein: 0, custom_calories: 0
+        eggs: 0,
+        chicken: 0,
+        fish: 0,
+        milk: 0,
+        curd: 0,
+        paneer: 0,
+        whey_protein: 0,
+        soya_chunks: 0,
+        peanut_butter: 0,
+        mutton: 0,
+        salads: 0,
+        banana: 0,
+        custom_protein: 0,
+        custom_carbs: 0,
+        custom_fiber: 0,
+        custom_calories: 0
       });
     }
     res.json(log);
@@ -325,7 +340,25 @@ router.get('/nutrition', authenticateToken, async (req, res) => {
 });
 
 router.post('/nutrition', authenticateToken, async (req, res) => {
-  const { date, eggs, chicken, fish, milk, curd, paneer, whey_protein, custom_protein, custom_calories } = req.body;
+  const { 
+    date, 
+    eggs, 
+    chicken, 
+    fish, 
+    milk, 
+    curd, 
+    paneer, 
+    whey_protein, 
+    soya_chunks,
+    peanut_butter,
+    mutton,
+    salads,
+    banana,
+    custom_protein, 
+    custom_carbs,
+    custom_fiber,
+    custom_calories 
+  } = req.body;
   if (!date) return res.status(400).json({ error: 'Date is required' });
 
   try {
@@ -333,7 +366,9 @@ router.post('/nutrition', authenticateToken, async (req, res) => {
     if (existing) {
       await db.queryRun(
         `UPDATE nutrition_logs 
-         SET eggs = ?, chicken = ?, fish = ?, milk = ?, curd = ?, paneer = ?, whey_protein = ?, custom_protein = ?, custom_calories = ? 
+         SET eggs = ?, chicken = ?, fish = ?, milk = ?, curd = ?, paneer = ?, whey_protein = ?, 
+             soya_chunks = ?, peanut_butter = ?, mutton = ?, salads = ?, banana = ?,
+             custom_protein = ?, custom_carbs = ?, custom_fiber = ?, custom_calories = ? 
          WHERE id = ?`,
         [
           parseInt(eggs || 0),
@@ -343,7 +378,14 @@ router.post('/nutrition', authenticateToken, async (req, res) => {
           parseFloat(curd || 0),
           parseFloat(paneer || 0),
           parseFloat(whey_protein || 0),
+          parseFloat(soya_chunks || 0),
+          parseFloat(peanut_butter || 0),
+          parseFloat(mutton || 0),
+          parseFloat(salads || 0),
+          parseFloat(banana || 0),
           parseFloat(custom_protein || 0),
+          parseFloat(custom_carbs || 0),
+          parseFloat(custom_fiber || 0),
           parseFloat(custom_calories || 0),
           existing.id
         ]
@@ -351,8 +393,10 @@ router.post('/nutrition', authenticateToken, async (req, res) => {
     } else {
       await db.queryRun(
         `INSERT INTO nutrition_logs 
-         (user_id, date, eggs, chicken, fish, milk, curd, paneer, whey_protein, custom_protein, custom_calories) 
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+         (user_id, date, eggs, chicken, fish, milk, curd, paneer, whey_protein, 
+          soya_chunks, peanut_butter, mutton, salads, banana,
+          custom_protein, custom_carbs, custom_fiber, custom_calories) 
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           req.user.id,
           date,
@@ -363,7 +407,14 @@ router.post('/nutrition', authenticateToken, async (req, res) => {
           parseFloat(curd || 0),
           parseFloat(paneer || 0),
           parseFloat(whey_protein || 0),
+          parseFloat(soya_chunks || 0),
+          parseFloat(peanut_butter || 0),
+          parseFloat(mutton || 0),
+          parseFloat(salads || 0),
+          parseFloat(banana || 0),
           parseFloat(custom_protein || 0),
+          parseFloat(custom_carbs || 0),
+          parseFloat(custom_fiber || 0),
           parseFloat(custom_calories || 0)
         ]
       );
@@ -682,7 +733,7 @@ router.get('/analytics', authenticateToken, async (req, res) => {
     );
 
     const proteinLogs = await db.queryAll(
-      `SELECT date, eggs, chicken, fish, milk, curd, paneer, whey_protein, custom_protein
+      `SELECT date, eggs, chicken, fish, milk, curd, paneer, whey_protein, soya_chunks, peanut_butter, mutton, salads, banana, custom_protein
        FROM nutrition_logs
        WHERE user_id = ?
        ORDER BY date ASC LIMIT 30`,
@@ -698,6 +749,11 @@ router.get('/analytics', authenticateToken, async (req, res) => {
         (p.curd || 0) * 0.04 +
         (p.paneer || 0) * 0.18 +
         (p.whey_protein || 0) * 24 +
+        (p.soya_chunks || 0) * 0.52 +
+        (p.peanut_butter || 0) * 0.25 +
+        (p.mutton || 0) * 0.25 +
+        (p.salads || 0) * 1.5 +
+        (p.banana || 0) * 1.3 +
         (p.custom_protein || 0);
 
       return { date: p.date, protein: Math.round(total) };

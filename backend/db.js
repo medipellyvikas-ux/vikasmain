@@ -275,10 +275,35 @@ export const initDatabase = async () => {
         curd REAL DEFAULT 0,
         paneer REAL DEFAULT 0,
         whey_protein REAL DEFAULT 0,
+        soya_chunks REAL DEFAULT 0,
+        peanut_butter REAL DEFAULT 0,
+        mutton REAL DEFAULT 0,
+        salads REAL DEFAULT 0,
+        banana REAL DEFAULT 0,
         custom_protein REAL DEFAULT 0,
+        custom_carbs REAL DEFAULT 0,
+        custom_fiber REAL DEFAULT 0,
         custom_calories REAL DEFAULT 0
       )
     `));
+
+    // Migration for existing tables: add columns if they do not exist
+    const migrateCols = [
+      { name: 'soya_chunks', type: 'REAL DEFAULT 0' },
+      { name: 'peanut_butter', type: 'REAL DEFAULT 0' },
+      { name: 'mutton', type: 'REAL DEFAULT 0' },
+      { name: 'salads', type: 'REAL DEFAULT 0' },
+      { name: 'banana', type: 'REAL DEFAULT 0' },
+      { name: 'custom_carbs', type: 'REAL DEFAULT 0' },
+      { name: 'custom_fiber', type: 'REAL DEFAULT 0' }
+    ];
+    for (const col of migrateCols) {
+      try {
+        await queryRun(`ALTER TABLE nutrition_logs ADD COLUMN ${col.name} ${col.type}`);
+      } catch (err) {
+        // Swallowing "duplicate column name" errors
+      }
+    }
 
     // 12. Water Logs Table
     await queryRun(translateSchema(`

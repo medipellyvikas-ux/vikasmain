@@ -16,13 +16,18 @@ import {
 } from 'lucide-react';
 
 const NUTRITION_ITEMS = [
-  { key: 'eggs', name: 'Eggs', unit: 'Count', protein: 6, calories: 70, multiplier: 1 },
-  { key: 'chicken', name: 'Chicken Breast', unit: 'Grams', protein: 0.31, calories: 1.65, multiplier: 100 },
-  { key: 'fish', name: 'Fish Fillet', unit: 'Grams', protein: 0.25, calories: 1.2, multiplier: 100 },
-  { key: 'milk', name: 'Whole Milk', unit: 'ml', protein: 0.033, calories: 0.6, multiplier: 100 },
-  { key: 'curd', name: 'Greek Curd', unit: 'Grams', protein: 0.04, calories: 0.98, multiplier: 100 },
-  { key: 'paneer', name: 'Paneer / Cottage Cheese', unit: 'Grams', protein: 0.18, calories: 3.65, multiplier: 100 },
-  { key: 'whey_protein', name: 'Whey Protein', unit: 'Scoops', protein: 24, calories: 120, multiplier: 1 }
+  { key: 'eggs', name: 'Eggs', unit: 'Count', protein: 6, carbs: 0.6, fiber: 0, calories: 70, multiplier: 1 },
+  { key: 'chicken', name: 'Chicken Breast', unit: 'Grams', protein: 0.31, carbs: 0, fiber: 0, calories: 1.65, multiplier: 100 },
+  { key: 'fish', name: 'Fish Fillet', unit: 'Grams', protein: 0.25, carbs: 0, fiber: 0, calories: 1.2, multiplier: 100 },
+  { key: 'milk', name: 'Whole Milk', unit: 'ml', protein: 0.033, carbs: 0.048, fiber: 0, calories: 0.6, multiplier: 100 },
+  { key: 'curd', name: 'Greek Curd', unit: 'Grams', protein: 0.04, carbs: 0.036, fiber: 0, calories: 0.98, multiplier: 100 },
+  { key: 'paneer', name: 'Paneer / Cottage Cheese', unit: 'Grams', protein: 0.18, carbs: 0.03, fiber: 0, calories: 3.65, multiplier: 100 },
+  { key: 'whey_protein', name: 'Whey Protein', unit: 'Scoops', protein: 24, carbs: 3, fiber: 0, calories: 120, multiplier: 1 },
+  { key: 'soya_chunks', name: 'Soya Chunks', unit: 'Grams', protein: 0.52, carbs: 0.33, fiber: 0.13, calories: 3.45, multiplier: 100 },
+  { key: 'peanut_butter', name: 'Peanut Butter', unit: 'Grams', protein: 0.25, carbs: 0.20, fiber: 0.06, calories: 5.88, multiplier: 100 },
+  { key: 'mutton', name: 'Mutton', unit: 'Grams', protein: 0.25, carbs: 0, fiber: 0, calories: 2.94, multiplier: 100 },
+  { key: 'salads', name: 'Salads', unit: 'Bowls', protein: 1.5, carbs: 5.0, fiber: 3.0, calories: 25, multiplier: 1 },
+  { key: 'banana', name: 'Banana', unit: 'Count', protein: 1.3, carbs: 27.0, fiber: 3.0, calories: 105, multiplier: 1 }
 ];
 
 export default function NutritionTracker() {
@@ -40,12 +45,21 @@ export default function NutritionTracker() {
     curd: 0,
     paneer: 0,
     whey_protein: 0,
+    soya_chunks: 0,
+    peanut_butter: 0,
+    mutton: 0,
+    salads: 0,
+    banana: 0,
     custom_protein: 0,
+    custom_carbs: 0,
+    custom_fiber: 0,
     custom_calories: 0
   });
 
   // Custom single food input
   const [customProtInput, setCustomProtInput] = useState('');
+  const [customCarbsInput, setCustomCarbsInput] = useState('');
+  const [customFiberInput, setCustomFiberInput] = useState('');
   const [customCalInput, setCustomCalInput] = useState('');
 
   // Sleep Log State
@@ -145,17 +159,23 @@ export default function NutritionTracker() {
   };
 
   const handleAddCustom = () => {
-    if (!customProtInput && !customCalInput) return;
+    if (!customProtInput && !customCarbsInput && !customFiberInput && !customCalInput) return;
     const pVal = parseFloat(customProtInput || 0);
+    const cbVal = parseFloat(customCarbsInput || 0);
+    const fVal = parseFloat(customFiberInput || 0);
     const cVal = parseFloat(customCalInput || 0);
     setLog(prev => ({
       ...prev,
       custom_protein: Math.round((parseFloat(prev.custom_protein || 0) + pVal) * 10) / 10,
+      custom_carbs: Math.round((parseFloat(prev.custom_carbs || 0) + cbVal) * 10) / 10,
+      custom_fiber: Math.round((parseFloat(prev.custom_fiber || 0) + fVal) * 10) / 10,
       custom_calories: Math.round((parseFloat(prev.custom_calories || 0) + cVal) * 10) / 10
     }));
     setCustomProtInput('');
+    setCustomCarbsInput('');
+    setCustomFiberInput('');
     setCustomCalInput('');
-    addToast("Custom item added", "Custom protein and calorie values stacked.", "success");
+    addToast("Custom item added", "Custom macronutrient and calorie values stacked.", "success");
   };
 
   // Calculations
@@ -164,6 +184,22 @@ export default function NutritionTracker() {
       NUTRITION_ITEMS.reduce((sum, item) => {
         return sum + (parseFloat(log[item.key] || 0) * item.protein);
       }, 0) + parseFloat(log.custom_protein || 0)
+    );
+  };
+
+  const calculateTotalCarbs = () => {
+    return Math.round(
+      NUTRITION_ITEMS.reduce((sum, item) => {
+        return sum + (parseFloat(log[item.key] || 0) * (item.carbs || 0));
+      }, 0) + parseFloat(log.custom_carbs || 0)
+    );
+  };
+
+  const calculateTotalFiber = () => {
+    return Math.round(
+      NUTRITION_ITEMS.reduce((sum, item) => {
+        return sum + (parseFloat(log[item.key] || 0) * (item.fiber || 0));
+      }, 0) + parseFloat(log.custom_fiber || 0)
     );
   };
 
@@ -176,8 +212,12 @@ export default function NutritionTracker() {
   };
 
   const totalProtein = calculateTotalProtein();
+  const totalCarbs = calculateTotalCarbs();
+  const totalFiber = calculateTotalFiber();
   const totalCalories = calculateTotalCalories();
   const proteinPercent = Math.min(100, Math.round((totalProtein / 120) * 100));
+  const carbsPercent = Math.min(100, Math.round((totalCarbs / 250) * 100));
+  const fiberPercent = Math.min(100, Math.round((totalFiber / 30) * 100));
 
   // Sleep hours compute helper
   const calculateSleepHours = () => {
@@ -244,11 +284,15 @@ export default function NutritionTracker() {
                 const loggedVal = log[item.key] || 0;
                 return (
                   <div key={item.key} className="p-4 rounded-2xl bg-slate-100/60 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800/60 flex items-center justify-between">
-                    <div>
-                      <span className="block font-bold text-slate-700 dark:text-slate-200 text-sm">{item.name}</span>
-                      <span className="block text-[10px] text-slate-500 dark:text-slate-550 mt-0.5">
-                        {item.unit === 'Grams' ? `100g portion` : item.unit === 'ml' ? `100ml portion` : `1 portion`}
-                        {' '}• {item.protein}g protein
+                    <div className="space-y-1">
+                      <span className="block font-bold text-slate-700 dark:text-slate-200 text-sm leading-tight">{item.name}</span>
+                      <span className="block text-[10px] text-slate-550 dark:text-slate-400 mt-0.5 leading-relaxed">
+                        {item.unit === 'Grams' ? `Per 100g` : item.unit === 'ml' ? `Per 100ml` : `Per portion`}
+                        {' '}• <span className="font-semibold text-fitgreen-500">P: {item.multiplier === 100 ? Math.round(item.protein * 100) : item.protein}g</span>
+                        {' '}• <span className="font-semibold text-amber-500">C: {item.multiplier === 100 ? Math.round(item.carbs * 100) : item.carbs}g</span>
+                        {item.fiber > 0 && ` • `}
+                        {item.fiber > 0 && <span className="font-semibold text-teal-500">F: {item.multiplier === 100 ? Math.round(item.fiber * 100) : item.fiber}g</span>}
+                        {' '}• {item.multiplier === 100 ? Math.round(item.calories * 100) : item.calories} kcal
                       </span>
                     </div>
 
@@ -278,24 +322,38 @@ export default function NutritionTracker() {
             {/* Custom food entry */}
             <div className="border-t border-slate-250 dark:border-slate-900 pt-5 space-y-3">
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">Quick Log Other Foods</span>
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                 <input
                   type="number"
-                  placeholder="Custom Protein (g)"
+                  placeholder="Protein (g)"
                   value={customProtInput}
                   onChange={(e) => setCustomProtInput(e.target.value)}
-                  className="flex-1 glass-input text-xs"
+                  className="w-full glass-input text-xs"
                 />
                 <input
                   type="number"
-                  placeholder="Custom Calories (kcal)"
+                  placeholder="Carbs (g)"
+                  value={customCarbsInput}
+                  onChange={(e) => setCustomCarbsInput(e.target.value)}
+                  className="w-full glass-input text-xs"
+                />
+                <input
+                  type="number"
+                  placeholder="Fiber (g)"
+                  value={customFiberInput}
+                  onChange={(e) => setCustomFiberInput(e.target.value)}
+                  className="w-full glass-input text-xs"
+                />
+                <input
+                  type="number"
+                  placeholder="Calories (kcal)"
                   value={customCalInput}
                   onChange={(e) => setCustomCalInput(e.target.value)}
-                  className="flex-1 glass-input text-xs"
+                  className="w-full glass-input text-xs"
                 />
                 <button
                   onClick={handleAddCustom}
-                  className="px-4 py-2.5 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all border border-slate-200 dark:border-slate-800/80"
+                  className="col-span-2 sm:col-span-1 px-4 py-2.5 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all border border-slate-200 dark:border-slate-800/80"
                 >
                   <PlusCircle className="w-4 h-4 text-cyber-400" /> Add Custom
                 </button>
@@ -326,6 +384,34 @@ export default function NutritionTracker() {
               </div>
             </div>
 
+            {/* Carbs bar */}
+            <div className="space-y-2">
+              <div className="flex justify-between text-xs font-bold">
+                <span className="text-slate-500 dark:text-slate-400">Total Carbs</span>
+                <span className="text-amber-500">{totalCarbs}g / 250g</span>
+              </div>
+              <div className="h-3 w-full bg-slate-100 dark:bg-slate-900 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800/50">
+                <div 
+                  className="h-full bg-gradient-to-r from-amber-600 to-amber-400 transition-all duration-500 rounded-full"
+                  style={{ width: `${carbsPercent}%` }}
+                ></div>
+              </div>
+            </div>
+
+            {/* Fiber bar */}
+            <div className="space-y-2">
+              <div className="flex justify-between text-xs font-bold">
+                <span className="text-slate-500 dark:text-slate-400">Total Dietary Fiber</span>
+                <span className="text-teal-500">{totalFiber}g / 30g</span>
+              </div>
+              <div className="h-3 w-full bg-slate-100 dark:bg-slate-900 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800/50">
+                <div 
+                  className="h-full bg-gradient-to-r from-teal-600 to-teal-400 transition-all duration-500 rounded-full"
+                  style={{ width: `${fiberPercent}%` }}
+                ></div>
+              </div>
+            </div>
+
             {/* Calories count */}
             <div className="space-y-2">
               <div className="flex justify-between text-xs font-bold">
@@ -338,7 +424,7 @@ export default function NutritionTracker() {
               <div className="flex gap-2 items-start">
                 <Heart className="w-4 h-4 text-fitgreen-400 shrink-0 mt-0.5" />
                 <span>
-                  For a 73 kg beginner male, maintaining 1.6g of protein per kg of body weight (approx 120g) prevents muscle soreness and optimizes muscle recovery after intense sessions.
+                  Track protein for muscle recovery, carbs for daily training energy, and fiber from salads and whole grains to support gut health and optimal nutrient digestion.
                 </span>
               </div>
             </div>
