@@ -1102,6 +1102,11 @@ export function Expenses({ data, onAdd, onEdit, onDelete, isAdmin, currentUser }
   const [editingId, setEditingId] = useState(null);
   const [selectedReceipt, setSelectedReceipt] = useState(null); // Receipt viewer modal
 
+  // Filtering states
+  const [filterMonth, setFilterMonth] = useState('');
+  const [filterCategory, setFilterCategory] = useState('');
+  const [filterDate, setFilterDate] = useState('');
+
   // Sync paidBy when currentUser changes if not admin
   React.useEffect(() => {
     if (!isAdmin && currentUser && !editingId) {
@@ -1193,6 +1198,32 @@ export function Expenses({ data, onAdd, onEdit, onDelete, isAdmin, currentUser }
     setDescription('');
     setReceiptBase64(null);
   };
+
+  // Dynamic list of unique months (YYYY-MM) from expense list
+  const uniqueMonths = useMemo(() => {
+    const months = new Set();
+    data.expensesList.forEach((e) => {
+      if (e.date && e.date.length >= 7) {
+        months.add(e.date.substring(0, 7));
+      }
+    });
+    return Array.from(months).sort().reverse();
+  }, [data.expensesList]);
+
+  // Filtering logic
+  const filteredExpenses = useMemo(() => {
+    return data.expensesList.filter((e) => {
+      if (filterCategory && e.category !== filterCategory) return false;
+      if (filterDate && e.date !== filterDate) return false;
+      if (filterMonth && !filterDate && !e.date.startsWith(filterMonth)) return false;
+      return true;
+    });
+  }, [data.expensesList, filterCategory, filterDate, filterMonth]);
+
+  // Total for the filtered items
+  const filteredTotal = useMemo(() => {
+    return filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
+  }, [filteredExpenses]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1311,44 +1342,126 @@ export function Expenses({ data, onAdd, onEdit, onDelete, isAdmin, currentUser }
       </div>
 
       {/* Expenses logs list */}
-      <div className="lg:col-span-2 glass-panel p-6 rounded-3xl shadow-premium dark:bg-navy-900/60">
-        <h3 className="text-sm font-bold text-slate-800 dark:text-white mb-4">Expense Logs</h3>
+      <div className="lg:col-span-2 glass-panel p-6 rounded-3xl shadow-premium dark:bg-navy-900/60 flex flex-col">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+          <h3 className="text-sm font-bold text-slate-800 dark:text-white flex items-center gap-2">
+            <ClipboardList className="w-4 h-4 text-brand-500" /> Expense Logs
+          </h3>
+          <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-navy-950 px-2.5 py-1 rounded-lg">
+            Showing {filteredExpenses.length} of {data.expensesList.length} logs
+          </div>
+        </div>
+
+        {/* Filters Panel */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4 bg-slate-50/50 dark:bg-navy-950/30 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800/50">
+          <div>
+            <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1.5">Month</label>
+            <select
+              value={filterMonth}
+              onChange={(e) => {
+                setFilterMonth(e.target.value);
+                setFilterDate(''); // Clear date filter when month changes
+              }}
+              className="w-full bg-white dark:bg-navy-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-brand-500 text-slate-700 dark:text-slate-200"
+            >
+              <option value="">All Months</option>
+              {uniqueMonths.map((m) => {
+                const [year, month] = m.split('-');
+                const dateObj = new Date(parseInt(year), parseInt(month) - 1, 1);
+                const monthLabel = dateObj.toLocaleString('default', { month: 'long', year: 'numeric' });
+                return (
+                  <option key={m} value={m}>
+                    {monthLabel}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1.5">Date</label>
+            <input
+              type="date"
+              value={filterDate}
+              onChange={(e) => {
+                setFilterDate(e.target.value);
+                setFilterMonth(''); // Clear month filter when date changes
+              }}
+              className="w-full bg-white dark:bg-navy-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-brand-500 text-slate-700 dark:text-slate-200"
+            />
+          </div>
+
+          <div>
+            <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-1.5">Category</label>
+            <select
+              value={filterCategory}
+              onChange={(e) => setCategory(e.target.value) || setFilterCategory(e.target.value)}
+              className="w-full bg-white dark:bg-navy-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-brand-500 text-slate-700 dark:text-slate-200"
+            >
+              <option value="">All Categories</option>
+              {CATEGORIES.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Filter Stats Header */}
+        {(filterMonth || filterDate || filterCategory) && (
+          <div className="flex items-center justify-between gap-2 mb-4 bg-brand-500/5 border border-brand-500/10 rounded-xl p-3.5">
+            <span className="text-[11px] text-slate-650 dark:text-slate-350">
+              Filtered Total: <span className="font-bold text-brand-600 dark:text-brand-400">{formatCurrency(filteredTotal)}</span>
+            </span>
+            <button
+              onClick={() => {
+                setFilterMonth('');
+                setFilterDate('');
+                setFilterCategory('');
+              }}
+              className="text-[10px] font-bold text-rose-500 hover:text-rose-600 dark:hover:text-rose-450 bg-rose-500/10 px-2.5 py-1.5 rounded-lg transition"
+            >
+              Clear Filters
+            </button>
+          </div>
+        )}
         
-        {/* Desktop view: tabular table */}
-        <div className="hidden md:block overflow-x-auto">
+        {/* Desktop view: tabular table scroll group */}
+        <div className="hidden md:block max-h-[460px] overflow-y-auto overflow-x-auto relative rounded-2xl border border-slate-150 dark:border-slate-800/80">
           <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
-                <th className="pb-3">Date</th>
-                <th className="pb-3">Category</th>
-                <th className="pb-3">Paid By</th>
-                <th className="pb-3">Description</th>
-                <th className="pb-3 text-center">Bill</th>
-                <th className="pb-3 text-right">Amount</th>
-                <th className="pb-3 text-right">Actions</th>
+            <thead className="sticky top-0 z-10 shadow-[0_1px_0_0_rgba(224,224,224,0.1)]">
+              <tr className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
+                <th className="pb-3 pt-3 px-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-100 dark:border-slate-800">Date</th>
+                <th className="pb-3 pt-3 px-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-100 dark:border-slate-800">Category</th>
+                <th className="pb-3 pt-3 px-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-100 dark:border-slate-800">Paid By</th>
+                <th className="pb-3 pt-3 px-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-100 dark:border-slate-800">Description</th>
+                <th className="pb-3 pt-3 px-4 text-center bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-100 dark:border-slate-800">Bill</th>
+                <th className="pb-3 pt-3 px-4 text-right bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-100 dark:border-slate-800">Amount</th>
+                <th className="pb-3 pt-3 px-4 text-right bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-100 dark:border-slate-800">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
-              {data.expensesList.map((e) => (
-                <tr key={e.id} className="text-xs">
-                  <td className="py-3.5 text-slate-500 dark:text-slate-400 font-medium">{e.date}</td>
-                  <td className="py-3.5 text-slate-800 dark:text-white font-semibold">{e.category}</td>
-                  <td className="py-3.5 text-slate-700 dark:text-slate-300 font-medium">{e.member_name}</td>
-                  <td className="py-3.5 text-slate-500 max-w-[120px] truncate">{e.description || '-'}</td>
-                  <td className="py-3.5 text-center">
+              {filteredExpenses.map((e) => (
+                <tr key={e.id} className="text-xs hover:bg-slate-50/50 dark:hover:bg-navy-950/20 transition-colors">
+                  <td className="py-3 px-4 text-slate-500 dark:text-slate-400 font-medium">{e.date}</td>
+                  <td className="py-3 px-4 text-slate-800 dark:text-white font-semibold">{e.category}</td>
+                  <td className="py-3 px-4 text-slate-700 dark:text-slate-300 font-medium">{e.member_name}</td>
+                  <td className="py-3 px-4 text-slate-500 max-w-[120px] truncate">{e.description || '-'}</td>
+                  <td className="py-3 px-4 text-center">
                     {e.receipt_base64 ? (
                       <button
                         onClick={() => setSelectedReceipt(e.receipt_base64)}
                         className="inline-flex items-center gap-1 text-[10px] font-bold text-brand-600 hover:text-brand-700 bg-brand-500/10 px-2 py-1 rounded-full transition"
                       >
-                        <Eye className="w-3 h-3" /> View
+                        <Eye className="w-3.5 h-3.5" /> View
                       </button>
                     ) : (
                       <span className="text-slate-300 dark:text-slate-700">-</span>
                     )}
                   </td>
-                  <td className="py-3.5 text-right font-bold text-slate-800 dark:text-white">{formatCurrency(e.amount)}</td>
-                  <td className="py-3.5 text-right">
+                  <td className="py-3 px-4 text-right font-bold text-slate-800 dark:text-white">{formatCurrency(e.amount)}</td>
+                  <td className="py-3 px-4 text-right">
                     {e.closed_month ? (
                       <span className="text-[10px] text-slate-400 italic">Closed ({e.closed_month})</span>
                     ) : (isAdmin || e.member_id === currentUser?.id) ? (
@@ -1366,19 +1479,19 @@ export function Expenses({ data, onAdd, onEdit, onDelete, isAdmin, currentUser }
                   </td>
                 </tr>
               ))}
-              {data.expensesList.length === 0 && (
+              {filteredExpenses.length === 0 && (
                 <tr>
-                  <td colSpan="7" className="py-8 text-center text-slate-400">No expenses recorded yet.</td>
+                  <td colSpan="7" className="py-8 text-center text-slate-400">No matching expenses found.</td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
 
-        {/* Mobile view: card-based list */}
-        <div className="md:hidden space-y-3">
-          {data.expensesList.map((e) => (
-            <div key={e.id} className="p-4 bg-slate-55 dark:bg-navy-950/40 border border-slate-200/50 dark:border-slate-800/50 rounded-2xl space-y-3">
+        {/* Mobile view: card-based list scroll group */}
+        <div className="md:hidden space-y-3 max-h-[460px] overflow-y-auto pr-1">
+          {filteredExpenses.map((e) => (
+            <div key={e.id} className="p-4 bg-slate-50/50 dark:bg-navy-950/20 border border-slate-200/50 dark:border-slate-800/50 rounded-2xl space-y-3">
               <div className="flex justify-between items-start">
                 <div>
                   <span className="text-[10px] text-slate-400 font-semibold uppercase">{e.date}</span>
@@ -1428,8 +1541,8 @@ export function Expenses({ data, onAdd, onEdit, onDelete, isAdmin, currentUser }
               </div>
             </div>
           ))}
-          {data.expensesList.length === 0 && (
-            <div className="py-8 text-center text-slate-400 text-xs">No expenses recorded yet.</div>
+          {filteredExpenses.length === 0 && (
+            <div className="py-8 text-center text-slate-400 text-xs">No matching expenses found.</div>
           )}
         </div>
       </div>
