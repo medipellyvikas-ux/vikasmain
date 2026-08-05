@@ -3,7 +3,7 @@ import {
   DollarSign, ArrowUpRight, ArrowDownRight, Users, Plus, Trash2, Edit2, 
   Download, Moon, Sun, LogOut, Shield, User, Key, Search, Filter, 
   AlertTriangle, CheckCircle, FileText, QrCode, ClipboardList, Database,
-  ArrowRight, ChevronDown, CreditCard, Image as ImageIcon, Sparkles, RefreshCw, Upload, Eye
+  ArrowRight, ChevronDown, CreditCard, Image as ImageIcon, Sparkles, RefreshCw, Upload, Eye, Share2
 } from 'lucide-react';
 import { 
   ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend,
