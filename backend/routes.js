@@ -293,7 +293,10 @@ export async function calculateSettlementsInternal() {
     memberConts[m.id] = {
       id: m.id,
       name: m.name,
+      mobile: m.mobile,
       contributed: 0,
+      expenses_paid: 0,
+      total_paid: 0,
       share: 0,
       difference: 0
     };
@@ -303,6 +306,7 @@ export async function calculateSettlementsInternal() {
   contributions.forEach(c => {
     if (memberConts[c.member_id]) {
       memberConts[c.member_id].contributed += c.amount;
+      memberConts[c.member_id].total_paid += c.amount;
     }
     totalContributions += c.amount;
   });
@@ -315,9 +319,9 @@ export async function calculateSettlementsInternal() {
     if (e.date === todayStr) {
       todayExpenses += e.amount;
     }
-    // Credit out-of-pocket expenses paid by member to their contributed total
     if (memberConts[e.paid_by_member_id]) {
-      memberConts[e.paid_by_member_id].contributed += e.amount;
+      memberConts[e.paid_by_member_id].expenses_paid += e.amount;
+      memberConts[e.paid_by_member_id].total_paid += e.amount;
     }
   });
   
@@ -330,7 +334,7 @@ export async function calculateSettlementsInternal() {
   members.forEach(m => {
     const mc = memberConts[m.id];
     mc.share = share;
-    mc.difference = mc.contributed - share;
+    mc.difference = mc.total_paid - share;
   });
   
   const creditors = [];

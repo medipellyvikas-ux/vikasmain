@@ -794,7 +794,13 @@ export function Dashboard({ data, user, transactions }) {
                 </div>
                 <div className="text-right">
                   <div className="font-bold text-slate-800 dark:text-white">{formatCurrency(m.contributed)}</div>
-                  <div className="text-[10px] text-slate-400">Total Contributed</div>
+                  <div className="text-[10px] text-slate-400">
+                    {m.expenses_paid > 0 ? (
+                      <span className="text-amber-600 dark:text-amber-400 font-semibold">+ {formatCurrency(m.expenses_paid)} expenses</span>
+                    ) : (
+                      'Total Contributed'
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
