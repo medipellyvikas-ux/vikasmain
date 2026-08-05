@@ -2714,6 +2714,15 @@ export function WhatsAppReportModal({ isOpen, onClose, initialMonth }) {
     }
   };
 
+  const handleOpenWhatsAppWeb = () => {
+    if (!reportData || !reportData.reportText) return;
+    const shareText = reportData.reportText;
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const baseUrl = isMobile ? 'https://wa.me/' : 'https://api.whatsapp.com/send';
+    const url = `${baseUrl}?text=${encodeURIComponent(shareText)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
   if (!isOpen) return null;
 
   const canShareFiles = typeof navigator !== 'undefined' && navigator.canShare && reportData;
@@ -2810,23 +2819,18 @@ export function WhatsAppReportModal({ isOpen, onClose, initialMonth }) {
             </button>
           )}
 
-          <a
-            href={reportData?.whatsappUrl || '#'}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => {
-              if (!reportData?.whatsappUrl) {
-                e.preventDefault();
-              }
-            }}
+          <button
+            type="button"
+            onClick={handleOpenWhatsAppWeb}
+            disabled={!reportData}
             className={`px-5 py-2.5 text-xs font-bold text-white rounded-xl shadow-lg transition flex items-center gap-2 ${
-              reportData?.whatsappUrl 
+              reportData 
                 ? 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/30 cursor-pointer' 
                 : 'bg-slate-400 cursor-not-allowed opacity-50'
             }`}
           >
             <WhatsAppIcon className="w-4 h-4" /> Share to WhatsApp Group
-          </a>
+          </button>
         </div>
       </div>
     </div>
