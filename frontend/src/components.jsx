@@ -2665,11 +2665,17 @@ export function WhatsAppReportModal({ isOpen, onClose, initialMonth }) {
     }
   }, [isOpen, selectedMonth]);
 
+  const [toastMessage, setToastMessage] = useState('');
+
   const handleCopy = () => {
     if (reportData?.reportText) {
       navigator.clipboard.writeText(reportData.reportText);
       setCopied(true);
-      setTimeout(() => setCopied(false), 3000);
+      setToastMessage('✓ Report Copied to Clipboard!');
+      setTimeout(() => {
+        setCopied(false);
+        setToastMessage('');
+      }, 3000);
     }
   };
 
@@ -2714,13 +2720,44 @@ export function WhatsAppReportModal({ isOpen, onClose, initialMonth }) {
     }
   };
 
-  const handleOpenWhatsAppWeb = () => {
+  const handleOpenWhatsAppWeb = async () => {
     if (!reportData || !reportData.reportText) return;
-    const shareText = reportData.reportText;
+
+    // 1. Copy full itemized report text to clipboard automatically
+    try {
+      await navigator.clipboard.writeText(reportData.reportText);
+      setCopied(true);
+      setToastMessage('✓ Full Report Copied! Opening WhatsApp...');
+      setTimeout(() => {
+        setCopied(false);
+        setToastMessage('');
+      }, 4000);
+    } catch (err) {
+      console.error('Clipboard copy error:', err);
+    }
+
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    const baseUrl = isMobile ? 'https://wa.me/' : 'https://api.whatsapp.com/send';
-    const url = `${baseUrl}?text=${encodeURIComponent(shareText)}`;
-    window.open(url, '_blank', 'noopener,noreferrer');
+
+    // 2. Mobile Native Share API (Passes full report directly to WhatsApp app)
+    if (isMobile && navigator.share) {
+      try {
+        await navigator.share({
+          title: `Room Expenses Report - ${reportData.monthTitle}`,
+          text: reportData.reportText
+        });
+        return;
+      } catch (err) {
+        console.log('Mobile share fallback', err);
+      }
+    }
+
+    // 3. Desktop WhatsApp Web (Passes clean concise text to avoid URI length blank screens)
+    const shortSummary = `🏡 *ROOM EXPENSES REPORT - ${reportData.monthTitle.toUpperCase()}* 📊\n💰 *Total Spent:* ₹${reportData.totalExpenses.toLocaleString('en-IN')}\n💵 *Wallet Balance:* ₹${reportData.walletBalance.toLocaleString('en-IN')}\n⚡ *Today's Spent:* ₹${reportData.todayExpenses.toLocaleString('en-IN')}\n\n📋 _(Full detailed itemized report is copied to your clipboard! Press Ctrl+V / Paste in your group chat to send!)_`;
+
+    const baseUrl = isMobile ? 'https://wa.me/' : 'https://web.whatsapp.com/send';
+    const waUrl = `${baseUrl}?text=${encodeURIComponent(shortSummary)}`;
+
+    window.open(waUrl, '_blank', 'noopener,noreferrer');
   };
 
   if (!isOpen) return null;
@@ -2751,6 +2788,12 @@ export function WhatsAppReportModal({ isOpen, onClose, initialMonth }) {
 
         {/* Content */}
         <div className="p-6 overflow-y-auto space-y-4 flex-1">
+          {toastMessage && (
+            <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 rounded-2xl text-xs font-bold flex items-center gap-2 animate-bounce">
+              <CheckCircle className="w-4 h-4" /> {toastMessage}
+            </div>
+          )}
+
           <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-50 dark:bg-navy-950/60 p-4 rounded-2xl border border-slate-200/60 dark:border-slate-800">
             <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
               Select Month:
