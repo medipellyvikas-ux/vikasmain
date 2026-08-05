@@ -2673,9 +2673,47 @@ export function WhatsAppReportModal({ isOpen, onClose, initialMonth }) {
     }
   };
 
-  const handleShareWhatsApp = () => {
-    if (reportData?.whatsappUrl) {
-      window.open(reportData.whatsappUrl, '_blank');
+  const handleShareWhatsApp = async () => {
+    try {
+      setLoading(true);
+      // Fetch Excel file blob from backend
+      const res = await fetch('/api/reports/export/excel', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
+      const blob = await res.blob();
+      const fileName = `room-expense-report-${selectedMonth}.xlsx`;
+      const excelFile = new File([blob], fileName, {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      });
+
+      // 1. Try Native Web Share API (attaches actual .xlsx file + text on Mobile/WhatsApp)
+      if (navigator.canShare && navigator.canShare({ files: [excelFile] })) {
+        await navigator.share({
+          title: `Room Expenses Report - ${selectedMonth}`,
+          text: reportData?.reportText || 'Room Expenses Report',
+          files: [excelFile]
+        });
+      } else {
+        // 2. Fallback for Desktop/WhatsApp Web: Auto-download Excel file AND open WhatsApp Web
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+
+        if (reportData?.whatsappUrl) {
+          window.open(reportData.whatsappUrl, '_blank');
+        }
+      }
+    } catch (err) {
+      console.error('Share error:', err);
+      if (reportData?.whatsappUrl) {
+        window.open(reportData.whatsappUrl, '_blank');
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
