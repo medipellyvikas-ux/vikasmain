@@ -2054,6 +2054,28 @@ export function Reports({ onTriggerRefresh, data, isAdmin }) {
             <ArrowUpRight className="w-4 h-4" />
           </button>
 
+          <button
+            onClick={async () => {
+              try {
+                const res = await fetch('/api/reports/whatsapp-auto-send', {
+                  method: 'POST',
+                  headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message);
+                alert(`✓ Daily WhatsApp Automation Executed!\nStatus: ${data.sendResult.status}\nLogged in Audit Logs.`);
+              } catch (err) {
+                alert(`Automation Error: ${err.message}`);
+              }
+            }}
+            className="w-full flex items-center justify-between p-3.5 bg-slate-100 dark:bg-navy-950/80 border border-slate-200/80 dark:border-slate-800 text-slate-700 dark:text-slate-200 rounded-2xl hover:bg-slate-200/50 font-medium transition text-xs"
+          >
+            <span className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-amber-500" /> Daily Cron Automation (Runs 9:00 PM)
+            </span>
+            <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold text-[10px] rounded-md">ACTIVE</span>
+          </button>
+
           <a
             href="/api/reports/export/excel"
             onClick={(e) => {
@@ -2723,7 +2745,10 @@ export function WhatsAppReportModal({ isOpen, onClose, initialMonth }) {
   const handleOpenWhatsAppApp = () => {
     if (!reportData || !reportData.reportText) return;
 
-    // Pass FULL report text directly via desktop protocol scheme
+    // 1. Auto-download Excel report file in background
+    handleDownloadExcel();
+
+    // 2. Open WhatsApp App with pre-filled report text
     const waAppUrl = `whatsapp://send?text=${encodeURIComponent(reportData.reportText)}`;
     window.location.href = waAppUrl;
   };
@@ -2731,6 +2756,10 @@ export function WhatsAppReportModal({ isOpen, onClose, initialMonth }) {
   const handleOpenWhatsAppWeb = () => {
     if (!reportData || !reportData.reportText) return;
 
+    // 1. Auto-download Excel report file in background
+    handleDownloadExcel();
+
+    // 2. Open WhatsApp Web with pre-filled report text
     const waWebUrl = `https://web.whatsapp.com/send?text=${encodeURIComponent(reportData.reportText)}`;
     window.open(waWebUrl, '_blank', 'noopener,noreferrer');
   };

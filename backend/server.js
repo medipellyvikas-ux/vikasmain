@@ -4,7 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import { initDatabase } from './db.js';
-import apiRouter from './routes.js';
+import apiRouter, { triggerAutomatedWhatsAppReport } from './routes.js';
 import gymRouter from './gymRoutes.js';
 
 // Load environment variables
@@ -45,10 +45,32 @@ app.get('*', (req, res, next) => {
   });
 });
 
+// Daily WhatsApp Automation Scheduler (Runs at 9:00 PM every day)
+let lastRunDate = '';
+function initDailyCronJob() {
+  console.log('[Daily Automation]: Initialized WhatsApp daily report scheduler (Runs at 9:00 PM daily).');
+  setInterval(async () => {
+    const now = new Date();
+    const todayDateStr = now.toISOString().split('T')[0];
+    
+    // Check if time is 21:00 (9:00 PM) and hasn't run yet today
+    if (now.getHours() === 21 && lastRunDate !== todayDateStr) {
+      lastRunDate = todayDateStr;
+      console.log(`[Daily Automation]: Running 9 PM WhatsApp report dispatch for ${todayDateStr}...`);
+      try {
+        await triggerAutomatedWhatsAppReport();
+      } catch (err) {
+        console.error('[Daily Automation Error]:', err.message);
+      }
+    }
+  }, 30000); // Checks every 30 seconds
+}
+
 // Start Express server and initialize database tables
 const startServer = async () => {
   try {
     await initDatabase();
+    initDailyCronJob();
     app.listen(PORT, () => {
       console.log(`====================================================`);
       console.log(`  Room Expense Tracker server is running on port ${PORT}`);

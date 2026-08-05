@@ -949,6 +949,66 @@ router.get('/reports/whatsapp-summary', authenticateToken, async (req, res) => {
   }
 });
 
+// Automated Daily WhatsApp Dispatch Function
+export async function triggerAutomatedWhatsAppReport() {
+  const now = new Date();
+  const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  
+  const reportData = await buildWhatsAppMonthlyReport(currentMonthStr);
+  
+  const webhookUrl = process.env.WHATSAPP_WEBHOOK_URL || process.env.WHATSAPP_API_URL;
+  const targetGroup = process.env.WHATSAPP_GROUP_ID || process.env.WHATSAPP_PHONE_NO;
+  const apiKey = process.env.WHATSAPP_API_KEY || process.env.WHATSAPP_TOKEN;
+
+  let sendResult = { status: 'logged_only', message: 'Report generated and logged.' };
+
+  if (webhookUrl) {
+    try {
+      const response = await fetch(webhookUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(apiKey ? { 'Authorization': `Bearer ${apiKey}` } : {})
+        },
+        body: JSON.stringify({
+          group_id: targetGroup,
+          to: targetGroup,
+          message: reportData.reportText,
+          summary: reportData
+        })
+      });
+      const resData = await response.text();
+      sendResult = { status: 'sent', response: resData };
+    } catch (err) {
+      console.error('[Auto WhatsApp Error]:', err.message);
+      sendResult = { status: 'failed', error: err.message };
+    }
+  }
+
+  await queryRun(
+    'INSERT INTO audit_logs (action, details) VALUES (?, ?)',
+    ['Auto WhatsApp Report', `Daily WhatsApp report generated for ${currentMonthStr}. Status: ${sendResult.status}`]
+  );
+
+  return {
+    success: true,
+    month: currentMonthStr,
+    sendResult,
+    reportData
+  };
+}
+
+// Trigger Daily WhatsApp Automation Endpoint (Admin / Scheduled)
+router.post('/reports/whatsapp-auto-send', authenticateToken, async (req, res) => {
+  try {
+    const result = await triggerAutomatedWhatsAppReport();
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to trigger automated WhatsApp report', error: err.message });
+  }
+});
+
+
 
 // Excel Export Router
 router.get('/reports/export/excel', authenticateToken, async (req, res) => {
