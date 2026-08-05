@@ -2673,50 +2673,6 @@ export function WhatsAppReportModal({ isOpen, onClose, initialMonth }) {
     }
   };
 
-  const handleShareWhatsApp = async () => {
-    try {
-      setLoading(true);
-      // Fetch Excel file blob from backend
-      const res = await fetch('/api/reports/export/excel', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-      });
-      const blob = await res.blob();
-      const fileName = `room-expense-report-${selectedMonth}.xlsx`;
-      const excelFile = new File([blob], fileName, {
-        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-      });
-
-      // 1. Try Native Web Share API (attaches actual .xlsx file + text on Mobile/WhatsApp)
-      if (navigator.canShare && navigator.canShare({ files: [excelFile] })) {
-        await navigator.share({
-          title: `Room Expenses Report - ${selectedMonth}`,
-          text: reportData?.reportText || 'Room Expenses Report',
-          files: [excelFile]
-        });
-      } else {
-        // 2. Fallback for Desktop/WhatsApp Web: Auto-download Excel file AND open WhatsApp Web
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-
-        if (reportData?.whatsappUrl) {
-          window.open(reportData.whatsappUrl, '_blank');
-        }
-      }
-    } catch (err) {
-      console.error('Share error:', err);
-      if (reportData?.whatsappUrl) {
-        window.open(reportData.whatsappUrl, '_blank');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleDownloadExcel = () => {
     fetch('/api/reports/export/excel', {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
@@ -2733,7 +2689,34 @@ export function WhatsAppReportModal({ isOpen, onClose, initialMonth }) {
     });
   };
 
+  const handleShareNativeFile = async () => {
+    try {
+      const res = await fetch('/api/reports/export/excel', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
+      const blob = await res.blob();
+      const fileName = `room-expense-report-${selectedMonth}.xlsx`;
+      const excelFile = new File([blob], fileName, {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      });
+
+      if (navigator.canShare && navigator.canShare({ files: [excelFile] })) {
+        await navigator.share({
+          title: `Room Expenses Report - ${selectedMonth}`,
+          text: reportData?.reportText || 'Room Expenses Report',
+          files: [excelFile]
+        });
+      } else {
+        handleDownloadExcel();
+      }
+    } catch (err) {
+      console.error('File share error:', err);
+    }
+  };
+
   if (!isOpen) return null;
+
+  const canShareFiles = typeof navigator !== 'undefined' && navigator.canShare && reportData;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn">
@@ -2818,13 +2801,32 @@ export function WhatsAppReportModal({ isOpen, onClose, initialMonth }) {
             {copied ? '✓ Copied!' : 'Copy to Clipboard'}
           </button>
 
-          <button
-            onClick={handleShareWhatsApp}
-            disabled={!reportData}
-            className="px-5 py-2.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow-lg shadow-emerald-600/30 transition flex items-center gap-2"
+          {canShareFiles && (
+            <button
+              onClick={handleShareNativeFile}
+              className="px-4 py-2.5 text-xs font-bold bg-teal-600 hover:bg-teal-500 text-white rounded-xl shadow-md transition flex items-center gap-2"
+            >
+              <Share2 className="w-4 h-4" /> Share File
+            </button>
+          )}
+
+          <a
+            href={reportData?.whatsappUrl || '#'}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => {
+              if (!reportData?.whatsappUrl) {
+                e.preventDefault();
+              }
+            }}
+            className={`px-5 py-2.5 text-xs font-bold text-white rounded-xl shadow-lg transition flex items-center gap-2 ${
+              reportData?.whatsappUrl 
+                ? 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-600/30 cursor-pointer' 
+                : 'bg-slate-400 cursor-not-allowed opacity-50'
+            }`}
           >
             <WhatsAppIcon className="w-4 h-4" /> Share to WhatsApp Group
-          </button>
+          </a>
         </div>
       </div>
     </div>
