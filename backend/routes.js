@@ -779,23 +779,6 @@ export async function buildWhatsAppMonthlyReport(requestedMonth) {
   const categoryTotals = {};
   const dailyMap = {};
 
-  expenses.forEach(e => {
-    totalExpenses += e.amount;
-    if (e.date === todayStr) {
-      todayExpenses += e.amount;
-    }
-
-    const cat = e.category || 'General';
-    categoryTotals[cat] = (categoryTotals[cat] || 0) + e.amount;
-
-    if (!dailyMap[e.date]) {
-      dailyMap[e.date] = { date: e.date, total: 0, items: [] };
-    }
-    dailyMap[e.date].total += e.amount;
-    const shortDesc = e.description ? `${cat}: ${e.description}` : cat;
-    dailyMap[e.date].items.push(`₹${e.amount.toFixed(0)} (${shortDesc} - ${e.member_name})`);
-  });
-
   let totalContributions = 0;
   const memberStats = {};
   members.forEach(m => {
@@ -807,6 +790,28 @@ export async function buildWhatsAppMonthlyReport(requestedMonth) {
     if (memberStats[c.member_id]) {
       memberStats[c.member_id].contributed += c.amount;
     }
+  });
+
+  expenses.forEach(e => {
+    totalExpenses += e.amount;
+    if (e.date === todayStr) {
+      todayExpenses += e.amount;
+    }
+
+    // Credit out-of-pocket expenses paid by member to their contribution total
+    if (memberStats[e.paid_by_member_id]) {
+      memberStats[e.paid_by_member_id].contributed += e.amount;
+    }
+
+    const cat = e.category || 'General';
+    categoryTotals[cat] = (categoryTotals[cat] || 0) + e.amount;
+
+    if (!dailyMap[e.date]) {
+      dailyMap[e.date] = { date: e.date, total: 0, items: [] };
+    }
+    dailyMap[e.date].total += e.amount;
+    const shortDesc = e.description ? `${cat}: ${e.description}` : cat;
+    dailyMap[e.date].items.push(`₹${e.amount.toFixed(0)} (${shortDesc} - ${e.member_name})`);
   });
 
   const walletBalance = totalContributions - totalExpenses;
