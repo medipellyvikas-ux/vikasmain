@@ -267,21 +267,26 @@ router.post('/members/:id/reset-password', authenticateToken, requireAdmin, asyn
 // ---------------- SETTLEMENT LOGIC HELPERS ----------------
 
 export async function calculateSettlementsInternal() {
+  const now = new Date();
+  const curMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
   const members = await queryAll("SELECT id, name, mobile, username, role, status FROM members WHERE status = 'active' AND role != 'admin'");
   
+  // Fetch active month contributions & expenses (or unclosed)
   const contributions = await queryAll(`
     SELECT c.*, m.name as member_name 
     FROM contributions c 
     JOIN members m ON c.member_id = m.id 
-    WHERE c.closed_month IS NULL
-  `);
+    WHERE c.closed_month IS NULL AND (c.date LIKE ? OR c.date = '')
+  `, [`${curMonthStr}%`]);
   
   const expenses = await queryAll(`
     SELECT e.*, m.name as member_name 
     FROM expenses e 
     JOIN members m ON e.paid_by_member_id = m.id 
-    WHERE e.closed_month IS NULL
-  `);
+    WHERE e.closed_month IS NULL AND (e.date LIKE ? OR e.date = '')
+  `, [`${curMonthStr}%`]);
   
   const memberConts = {};
   members.forEach(m => {
@@ -303,10 +308,20 @@ export async function calculateSettlementsInternal() {
   });
   
   let totalExpenses = 0;
+  let todayExpenses = 0;
+
   expenses.forEach(e => {
     totalExpenses += e.amount;
+    if (e.date === todayStr) {
+      todayExpenses += e.amount;
+    }
+    // Credit out-of-pocket expenses paid by member to their contributed total
+    if (memberConts[e.paid_by_member_id]) {
+      memberConts[e.paid_by_member_id].contributed += e.amount;
+    }
   });
   
+  // Wallet balance based on active month (Contributions - Expenses)
   const walletBalance = totalContributions - totalExpenses;
   
   const activeCount = members.length;
@@ -366,22 +381,6 @@ export async function calculateSettlementsInternal() {
     }
   }
   
-  // Calculate today's/this month's expenses
-  const todayStr = new Date().toISOString().split('T')[0]; // local or server time YYYY-MM-DD
-  const curMonthStr = todayStr.substring(0, 7); // YYYY-MM
-  
-  let todayExpenses = 0;
-  let thisMonthExpenses = 0;
-  
-  expenses.forEach(e => {
-    if (e.date === todayStr) {
-      todayExpenses += e.amount;
-    }
-    if (e.date.startsWith(curMonthStr)) {
-      thisMonthExpenses += e.amount;
-    }
-  });
-  
   return {
     members: Object.values(memberConts),
     payments,
@@ -389,7 +388,8 @@ export async function calculateSettlementsInternal() {
     totalExpenses,
     walletBalance,
     todayExpenses,
-    thisMonthExpenses,
+    thisMonthExpenses: totalExpenses,
+    thisMonthContributions: totalContributions,
     transactionCount: contributions.length + expenses.length
   };
 }
