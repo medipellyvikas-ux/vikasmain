@@ -2720,46 +2720,18 @@ export function WhatsAppReportModal({ isOpen, onClose, initialMonth }) {
     }
   };
 
-  const handleOpenWhatsAppApp = async () => {
+  const handleOpenWhatsAppApp = () => {
     if (!reportData || !reportData.reportText) return;
 
-    try {
-      await navigator.clipboard.writeText(reportData.reportText);
-      setCopied(true);
-      setToastMessage('✓ Full Report Copied! Opening WhatsApp App...');
-      setTimeout(() => {
-        setCopied(false);
-        setToastMessage('');
-      }, 4000);
-    } catch (err) {
-      console.error('Clipboard copy error:', err);
-    }
-
-    const shortSummary = `🏡 *ROOM EXPENSES REPORT - ${reportData.monthTitle.toUpperCase()}* 📊\n💰 *Total Spent:* ₹${reportData.totalExpenses.toLocaleString('en-IN')}\n💵 *Wallet Balance:* ₹${reportData.walletBalance.toLocaleString('en-IN')}\n⚡ *Today's Spent:* ₹${reportData.todayExpenses.toLocaleString('en-IN')}\n\n📋 _(Full detailed itemized report is copied to your clipboard! Press Ctrl+V / Paste in your group chat to send!)_`;
-
-    // whatsapp:// protocol launches the native desktop app or phone app directly!
-    const waAppUrl = `whatsapp://send?text=${encodeURIComponent(shortSummary)}`;
+    // Pass FULL report text directly via desktop protocol scheme
+    const waAppUrl = `whatsapp://send?text=${encodeURIComponent(reportData.reportText)}`;
     window.location.href = waAppUrl;
   };
 
-  const handleOpenWhatsAppWeb = async () => {
+  const handleOpenWhatsAppWeb = () => {
     if (!reportData || !reportData.reportText) return;
 
-    try {
-      await navigator.clipboard.writeText(reportData.reportText);
-      setCopied(true);
-      setToastMessage('✓ Full Report Copied! Opening WhatsApp Web...');
-      setTimeout(() => {
-        setCopied(false);
-        setToastMessage('');
-      }, 4000);
-    } catch (err) {
-      console.error('Clipboard copy error:', err);
-    }
-
-    const shortSummary = `🏡 *ROOM EXPENSES REPORT - ${reportData.monthTitle.toUpperCase()}* 📊\n💰 *Total Spent:* ₹${reportData.totalExpenses.toLocaleString('en-IN')}\n💵 *Wallet Balance:* ₹${reportData.walletBalance.toLocaleString('en-IN')}\n⚡ *Today's Spent:* ₹${reportData.todayExpenses.toLocaleString('en-IN')}\n\n📋 _(Full detailed itemized report is copied to your clipboard! Press Ctrl+V / Paste in your group chat to send!)_`;
-
-    const waWebUrl = `https://web.whatsapp.com/send?text=${encodeURIComponent(shortSummary)}`;
+    const waWebUrl = `https://web.whatsapp.com/send?text=${encodeURIComponent(reportData.reportText)}`;
     window.open(waWebUrl, '_blank', 'noopener,noreferrer');
   };
 
