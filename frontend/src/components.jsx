@@ -2720,14 +2720,13 @@ export function WhatsAppReportModal({ isOpen, onClose, initialMonth }) {
     }
   };
 
-  const handleOpenWhatsAppWeb = async () => {
+  const handleOpenWhatsAppApp = async () => {
     if (!reportData || !reportData.reportText) return;
 
-    // 1. Copy full itemized report text to clipboard automatically
     try {
       await navigator.clipboard.writeText(reportData.reportText);
       setCopied(true);
-      setToastMessage('✓ Full Report Copied! Opening WhatsApp...');
+      setToastMessage('✓ Full Report Copied! Opening WhatsApp App...');
       setTimeout(() => {
         setCopied(false);
         setToastMessage('');
@@ -2736,28 +2735,32 @@ export function WhatsAppReportModal({ isOpen, onClose, initialMonth }) {
       console.error('Clipboard copy error:', err);
     }
 
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-    // 2. Mobile Native Share API (Passes full report directly to WhatsApp app)
-    if (isMobile && navigator.share) {
-      try {
-        await navigator.share({
-          title: `Room Expenses Report - ${reportData.monthTitle}`,
-          text: reportData.reportText
-        });
-        return;
-      } catch (err) {
-        console.log('Mobile share fallback', err);
-      }
-    }
-
-    // 3. Desktop WhatsApp Web (Passes clean concise text to avoid URI length blank screens)
     const shortSummary = `🏡 *ROOM EXPENSES REPORT - ${reportData.monthTitle.toUpperCase()}* 📊\n💰 *Total Spent:* ₹${reportData.totalExpenses.toLocaleString('en-IN')}\n💵 *Wallet Balance:* ₹${reportData.walletBalance.toLocaleString('en-IN')}\n⚡ *Today's Spent:* ₹${reportData.todayExpenses.toLocaleString('en-IN')}\n\n📋 _(Full detailed itemized report is copied to your clipboard! Press Ctrl+V / Paste in your group chat to send!)_`;
 
-    const baseUrl = isMobile ? 'https://wa.me/' : 'https://web.whatsapp.com/send';
-    const waUrl = `${baseUrl}?text=${encodeURIComponent(shortSummary)}`;
+    // whatsapp:// protocol launches the native desktop app or phone app directly!
+    const waAppUrl = `whatsapp://send?text=${encodeURIComponent(shortSummary)}`;
+    window.location.href = waAppUrl;
+  };
 
-    window.open(waUrl, '_blank', 'noopener,noreferrer');
+  const handleOpenWhatsAppWeb = async () => {
+    if (!reportData || !reportData.reportText) return;
+
+    try {
+      await navigator.clipboard.writeText(reportData.reportText);
+      setCopied(true);
+      setToastMessage('✓ Full Report Copied! Opening WhatsApp Web...');
+      setTimeout(() => {
+        setCopied(false);
+        setToastMessage('');
+      }, 4000);
+    } catch (err) {
+      console.error('Clipboard copy error:', err);
+    }
+
+    const shortSummary = `🏡 *ROOM EXPENSES REPORT - ${reportData.monthTitle.toUpperCase()}* 📊\n💰 *Total Spent:* ₹${reportData.totalExpenses.toLocaleString('en-IN')}\n💵 *Wallet Balance:* ₹${reportData.walletBalance.toLocaleString('en-IN')}\n⚡ *Today's Spent:* ₹${reportData.todayExpenses.toLocaleString('en-IN')}\n\n📋 _(Full detailed itemized report is copied to your clipboard! Press Ctrl+V / Paste in your group chat to send!)_`;
+
+    const waWebUrl = `https://web.whatsapp.com/send?text=${encodeURIComponent(shortSummary)}`;
+    window.open(waWebUrl, '_blank', 'noopener,noreferrer');
   };
 
   if (!isOpen) return null;
@@ -2864,7 +2867,7 @@ export function WhatsAppReportModal({ isOpen, onClose, initialMonth }) {
 
           <button
             type="button"
-            onClick={handleOpenWhatsAppWeb}
+            onClick={handleOpenWhatsAppApp}
             disabled={!reportData}
             className={`px-5 py-2.5 text-xs font-bold text-white rounded-xl shadow-lg transition flex items-center gap-2 ${
               reportData 
@@ -2872,7 +2875,20 @@ export function WhatsAppReportModal({ isOpen, onClose, initialMonth }) {
                 : 'bg-slate-400 cursor-not-allowed opacity-50'
             }`}
           >
-            <WhatsAppIcon className="w-4 h-4" /> Share to WhatsApp Group
+            <WhatsAppIcon className="w-4 h-4" /> Open WhatsApp App
+          </button>
+
+          <button
+            type="button"
+            onClick={handleOpenWhatsAppWeb}
+            disabled={!reportData}
+            className={`px-4 py-2.5 text-xs font-semibold rounded-xl transition flex items-center gap-2 ${
+              reportData 
+                ? 'bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 dark:text-emerald-400 border border-emerald-500/20 cursor-pointer' 
+                : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+            }`}
+          >
+            WhatsApp Web
           </button>
         </div>
       </div>
