@@ -488,6 +488,7 @@ export function Login({ onLogin }) {
 // ---------------- DASHBOARD COMPONENT ----------------
 export function Dashboard({ data, user, transactions }) {
   const isBalanceLow = data.walletBalance < 1000;
+  const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
 
   // Chart 1: Category Wise Pie Chart
   const pieChartData = useMemo(() => {
@@ -558,6 +559,30 @@ export function Dashboard({ data, user, transactions }) {
 
   return (
     <div className="space-y-6">
+      <WhatsAppReportModal 
+        isOpen={isWhatsAppModalOpen} 
+        onClose={() => setIsWhatsAppModalOpen(false)} 
+      />
+
+      {/* Top Banner Action Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 glass-panel p-4 px-6 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800/80 bg-white/70 dark:bg-navy-900/60">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl">
+            <WhatsAppIcon className="w-5 h-5" />
+          </div>
+          <div>
+            <h4 className="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider">WhatsApp Group Expenses Report</h4>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Share daily expenses list, category totals & settlements with 1-click</p>
+          </div>
+        </div>
+        <button
+          onClick={() => setIsWhatsAppModalOpen(true)}
+          className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-xs shadow-md shadow-emerald-600/20 transition cursor-pointer"
+        >
+          <WhatsAppIcon className="w-4 h-4" /> Share to WhatsApp Group
+        </button>
+      </div>
+
       {/* Notifications bar */}
       {isBalanceLow && (
         <div className="p-4 bg-rose-500/10 dark:bg-rose-500/5 border border-rose-500/30 rounded-2xl text-rose-700 dark:text-rose-400 flex items-center gap-3 animate-pulse shadow-sm">
@@ -1956,6 +1981,7 @@ export function Reports({ onTriggerRefresh, data, isAdmin }) {
   const [closeMonth, setCloseMonth] = useState(new Date().toISOString().substring(0, 7)); // YYYY-MM
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
+  const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
 
   // Fetch closings history
   const fetchClosings = async () => {
@@ -2004,14 +2030,30 @@ export function Reports({ onTriggerRefresh, data, isAdmin }) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <WhatsAppReportModal 
+        isOpen={isWhatsAppOpen} 
+        onClose={() => setIsWhatsAppOpen(false)} 
+        initialMonth={closeMonth} 
+      />
+
       {/* File Export and download card */}
       <div className="lg:col-span-1 glass-panel p-6 rounded-3xl shadow-premium dark:bg-navy-900/60 space-y-5">
         <div>
-          <h3 className="text-sm font-bold text-slate-800 dark:text-white">Download Reports</h3>
-          <p className="text-xs text-slate-400 mt-1">Export transaction logs and settlement tables for active accounts.</p>
+          <h3 className="text-sm font-bold text-slate-800 dark:text-white">Download & Share Reports</h3>
+          <p className="text-xs text-slate-400 mt-1">Export transaction logs, PDF statements, or share live reports directly to WhatsApp.</p>
         </div>
 
         <div className="space-y-3">
+          <button
+            onClick={() => setIsWhatsAppOpen(true)}
+            className="w-full flex items-center justify-between p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-2xl hover:bg-emerald-500/15 font-semibold transition text-xs"
+          >
+            <span className="flex items-center gap-2">
+              <WhatsAppIcon className="w-4.5 h-4.5 text-emerald-500" /> Share Report to WhatsApp Group
+            </span>
+            <ArrowUpRight className="w-4 h-4" />
+          </button>
+
           <a
             href="/api/reports/export/excel"
             onClick={(e) => {
@@ -2584,3 +2626,170 @@ export function Profile({ user, onUpdateProfile, config, onSaveConfig, isAdmin }
     </div>
   );
 }
+
+// ---------------- WHATSAPP ICON SVG ----------------
+export const WhatsAppIcon = ({ className = "w-5 h-5" }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.572-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414-.074-.124-.272-.198-.57-.347m-5.421 7.461c-1.78 0-3.522-.476-5.056-1.378l-.362-.215-3.757.985.999-3.664-.236-.375a9.85 9.85 0 0 1-1.516-5.26c0-5.445 4.43-9.875 9.876-9.875 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.89 6.983c0 5.447-4.431 9.876-9.874 9.876m0-21.759C5.319.084.084 5.319.084 11.767c0 2.06.537 4.07 1.558 5.837L.053 23.947l6.535-1.714a11.62 11.62 0 0 0 5.464 1.373h.005c6.446 0 11.681-5.235 11.681-11.684.001-3.123-1.213-6.059-3.418-8.267C18.114 1.45 15.178.084 12.051.084" />
+  </svg>
+);
+
+// ---------------- WHATSAPP REPORT MODAL ----------------
+export function WhatsAppReportModal({ isOpen, onClose, initialMonth }) {
+  const [selectedMonth, setSelectedMonth] = useState(initialMonth || new Date().toISOString().substring(0, 7));
+  const [reportData, setReportData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [error, setError] = useState('');
+
+  const fetchReport = async (m) => {
+    setLoading(true);
+    setError('');
+    try {
+      const res = await fetch(`/api/reports/whatsapp-summary?month=${m}`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Failed to fetch report');
+      setReportData(data);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    if (isOpen) {
+      fetchReport(selectedMonth);
+    }
+  }, [isOpen, selectedMonth]);
+
+  const handleCopy = () => {
+    if (reportData?.reportText) {
+      navigator.clipboard.writeText(reportData.reportText);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 3000);
+    }
+  };
+
+  const handleShareWhatsApp = () => {
+    if (reportData?.whatsappUrl) {
+      window.open(reportData.whatsappUrl, '_blank');
+    }
+  };
+
+  const handleDownloadExcel = () => {
+    fetch('/api/reports/export/excel', {
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    })
+    .then(res => res.blob())
+    .then(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `room-expense-report-${selectedMonth}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-white dark:bg-navy-900 border border-slate-200 dark:border-slate-800 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        {/* Header */}
+        <div className="px-6 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-white/20 rounded-2xl">
+              <WhatsAppIcon className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h3 className="font-bold text-base">WhatsApp Expenses Report</h3>
+              <p className="text-xs text-emerald-100">Send daily expenses & settlement report to your Room WhatsApp Group</p>
+            </div>
+          </div>
+          <button 
+            onClick={onClose}
+            className="p-2 hover:bg-white/10 rounded-full text-white transition text-lg font-bold"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-6 overflow-y-auto space-y-4 flex-1">
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-50 dark:bg-navy-950/60 p-4 rounded-2xl border border-slate-200/60 dark:border-slate-800">
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+              Select Month:
+            </label>
+            <input 
+              type="month"
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="bg-white dark:bg-navy-900 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs font-medium text-slate-800 dark:text-slate-200"
+            />
+          </div>
+
+          {loading ? (
+            <div className="py-12 text-center text-slate-400 text-sm animate-pulse">
+              Generating WhatsApp report for {selectedMonth}...
+            </div>
+          ) : error ? (
+            <div className="p-4 bg-rose-500/10 border border-rose-500/30 text-rose-500 rounded-2xl text-xs">
+              {error}
+            </div>
+          ) : reportData ? (
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Live WhatsApp Format Preview</span>
+                <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                  {reportData.dailyBreakdown.length} days recorded • ₹{reportData.totalExpenses.toLocaleString('en-IN')} total
+                </span>
+              </div>
+              <pre className="p-4 bg-slate-900 text-slate-100 rounded-2xl text-xs font-mono whitespace-pre-wrap leading-relaxed max-h-80 overflow-y-auto border border-slate-800 select-all shadow-inner">
+                {reportData.reportText}
+              </pre>
+            </div>
+          ) : null}
+        </div>
+
+        {/* Footer Actions */}
+        <div className="p-5 border-t border-slate-100 dark:border-slate-800/80 bg-slate-50 dark:bg-navy-950/40 flex flex-wrap items-center justify-end gap-3">
+          <button
+            onClick={onClose}
+            className="px-4 py-2.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-200/60 dark:hover:bg-navy-800 rounded-xl transition"
+          >
+            Cancel
+          </button>
+          
+          <button
+            onClick={handleDownloadExcel}
+            className="px-4 py-2.5 text-xs font-semibold bg-brand-500/10 hover:bg-brand-500/20 text-brand-600 dark:text-brand-400 border border-brand-500/20 rounded-xl transition flex items-center gap-2"
+          >
+            <Download className="w-4 h-4" /> Download Excel (.xlsx)
+          </button>
+
+          <button
+            onClick={handleCopy}
+            disabled={!reportData}
+            className="px-4 py-2.5 text-xs font-semibold bg-slate-200 dark:bg-navy-800 hover:bg-slate-300 dark:hover:bg-navy-700 text-slate-800 dark:text-slate-100 rounded-xl transition flex items-center gap-2"
+          >
+            {copied ? '✓ Copied!' : 'Copy to Clipboard'}
+          </button>
+
+          <button
+            onClick={handleShareWhatsApp}
+            disabled={!reportData}
+            className="px-5 py-2.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow-lg shadow-emerald-600/30 transition flex items-center gap-2"
+          >
+            <WhatsAppIcon className="w-4 h-4" /> Share to WhatsApp Group
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+

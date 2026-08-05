@@ -746,6 +746,205 @@ router.post('/reports/close', authenticateToken, requireAdmin, async (req, res) 
   }
 });
 
+// ---------------- WHATSAPP DAILY EXPENSES REPORT ROUTE ----------------
+
+export async function buildWhatsAppMonthlyReport(requestedMonth) {
+  const now = new Date();
+  const currentMonthStr = requestedMonth || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+  const monthDate = new Date(`${currentMonthStr}-01T00:00:00`);
+  const monthTitle = monthDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+  const members = await queryAll("SELECT id, name, mobile, username, role, status FROM members WHERE status = 'active' AND role != 'admin'");
+  
+  const expenses = await queryAll(`
+    SELECT e.*, m.name as member_name 
+    FROM expenses e 
+    JOIN members m ON e.paid_by_member_id = m.id 
+    WHERE e.date LIKE ? OR e.closed_month = ?
+    ORDER BY e.date ASC, e.id ASC
+  `, [`${currentMonthStr}%`, currentMonthStr]);
+
+  const contributions = await queryAll(`
+    SELECT c.*, m.name as member_name 
+    FROM contributions c 
+    JOIN members m ON c.member_id = m.id 
+    WHERE c.date LIKE ? OR c.closed_month = ?
+    ORDER BY c.date ASC, c.id ASC
+  `, [`${currentMonthStr}%`, currentMonthStr]);
+
+  let totalExpenses = 0;
+  let todayExpenses = 0;
+  const categoryTotals = {};
+  const dailyMap = {};
+
+  expenses.forEach(e => {
+    totalExpenses += e.amount;
+    if (e.date === todayStr) {
+      todayExpenses += e.amount;
+    }
+
+    const cat = e.category || 'General';
+    categoryTotals[cat] = (categoryTotals[cat] || 0) + e.amount;
+
+    if (!dailyMap[e.date]) {
+      dailyMap[e.date] = { date: e.date, total: 0, items: [] };
+    }
+    dailyMap[e.date].total += e.amount;
+    const shortDesc = e.description ? `${cat}: ${e.description}` : cat;
+    dailyMap[e.date].items.push(`₹${e.amount.toFixed(0)} (${shortDesc} - ${e.member_name})`);
+  });
+
+  let totalContributions = 0;
+  const memberStats = {};
+  members.forEach(m => {
+    memberStats[m.id] = { id: m.id, name: m.name, contributed: 0, share: 0, difference: 0 };
+  });
+
+  contributions.forEach(c => {
+    totalContributions += c.amount;
+    if (memberStats[c.member_id]) {
+      memberStats[c.member_id].contributed += c.amount;
+    }
+  });
+
+  const walletBalance = totalContributions - totalExpenses;
+  const activeCount = members.length;
+  const perMemberShare = activeCount > 0 ? totalExpenses / activeCount : 0;
+
+  const creditors = [];
+  const debtors = [];
+
+  members.forEach(m => {
+    const ms = memberStats[m.id];
+    ms.share = Math.round(perMemberShare * 100) / 100;
+    ms.difference = Math.round((ms.contributed - perMemberShare) * 100) / 100;
+
+    if (ms.difference > 0.01) {
+      creditors.push({ id: ms.id, name: ms.name, difference: ms.difference });
+    } else if (ms.difference < -0.01) {
+      debtors.push({ id: ms.id, name: ms.name, absDiff: Math.abs(ms.difference) });
+    }
+  });
+
+  creditors.sort((a, b) => b.difference - a.difference);
+  debtors.sort((a, b) => b.absDiff - a.absDiff);
+
+  const payments = [];
+  let cIdx = 0, dIdx = 0;
+  while (cIdx < creditors.length && dIdx < debtors.length) {
+    const creditor = creditors[cIdx];
+    const debtor = debtors[dIdx];
+    const amt = Math.min(creditor.difference, debtor.absDiff);
+    if (amt > 0.01) {
+      payments.push({
+        fromName: debtor.name,
+        toName: creditor.name,
+        amount: Math.round(amt * 100) / 100
+      });
+    }
+    creditor.difference -= amt;
+    debtor.absDiff -= amt;
+    if (creditor.difference < 0.01) cIdx++;
+    if (debtor.absDiff < 0.01) dIdx++;
+  }
+
+  let lines = [];
+  lines.push(`🏡 *ROOM EXPENSES REPORT - ${monthTitle.toUpperCase()}* 📊`);
+  lines.push(`🗓️ *Summary as of ${todayStr}*`);
+  lines.push(``);
+  lines.push(`💰 *Total Month Expenses:* ₹${totalExpenses.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`);
+  lines.push(`💵 *Total Contributions:* ₹${totalContributions.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`);
+  lines.push(`👛 *Wallet Balance:* ₹${walletBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`);
+  if (todayExpenses > 0) {
+    lines.push(`⚡ *Today's Expenses:* ₹${todayExpenses.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`);
+  }
+  lines.push(``);
+  lines.push(`-----------------------------------`);
+  lines.push(`📌 *DAILY EXPENSES BREAKDOWN*`);
+
+  const dailyDates = Object.keys(dailyMap).sort();
+  if (dailyDates.length === 0) {
+    lines.push(`_No expenses recorded for this month yet._`);
+  } else {
+    dailyDates.forEach(d => {
+      const dayData = dailyMap[d];
+      const dObj = new Date(`${d}T00:00:00`);
+      const formattedDay = dObj.toLocaleDateString('en-US', { day: '2-digit', month: 'short' });
+      lines.push(`• *${formattedDay}:* ₹${dayData.total.toFixed(2)} — ${dayData.items.join(', ')}`);
+    });
+  }
+
+  lines.push(``);
+  lines.push(`-----------------------------------`);
+  lines.push(`📊 *CATEGORY BREAKDOWN*`);
+  const catEntries = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
+  if (catEntries.length === 0) {
+    lines.push(`_No category data._`);
+  } else {
+    catEntries.forEach(([catName, catAmt]) => {
+      const pct = totalExpenses > 0 ? Math.round((catAmt / totalExpenses) * 100) : 0;
+      lines.push(`• *${catName}:* ₹${catAmt.toFixed(2)} (${pct}%)`);
+    });
+  }
+
+  lines.push(``);
+  lines.push(`-----------------------------------`);
+  lines.push(`⚖️ *NET MEMBER SETTLEMENTS*`);
+  Object.values(memberStats).forEach(ms => {
+    const statusStr = ms.difference >= 0 
+      ? `*+₹${ms.difference.toFixed(2)}* (To Receive)` 
+      : `*-₹${Math.abs(ms.difference).toFixed(2)}* (To Pay)`;
+    lines.push(`• *${ms.name}:* Paid ₹${ms.contributed.toFixed(2)} | Share ₹${ms.share.toFixed(2)} | Net: ${statusStr}`);
+  });
+
+  lines.push(``);
+  if (payments.length > 0) {
+    lines.push(`👉 *SETTLEMENT ACTION ITEMS:*`);
+    payments.forEach(p => {
+      lines.push(`• *${p.fromName}* ➡️ *${p.toName}*: ₹${p.amount.toFixed(2)}`);
+    });
+  } else {
+    lines.push(`✅ *All room accounts are balanced! No settlements needed.*`);
+  }
+
+  lines.push(``);
+  lines.push(`-----------------------------------`);
+  lines.push(`Sent via Room Expense Tracker 🚀`);
+
+  const reportText = lines.join('\n');
+  const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(reportText)}`;
+
+  return {
+    month: currentMonthStr,
+    monthTitle,
+    totalExpenses,
+    totalContributions,
+    walletBalance,
+    todayExpenses,
+    dailyCount: dailyDates.length,
+    dailyBreakdown: Object.values(dailyMap),
+    categoryBreakdown: categoryTotals,
+    memberStats: Object.values(memberStats),
+    payments,
+    reportText,
+    whatsappUrl
+  };
+}
+
+// Get WhatsApp Monthly Expense Report
+router.get('/reports/whatsapp-summary', authenticateToken, async (req, res) => {
+  try {
+    const requestedMonth = req.query.month; // Optional YYYY-MM
+    const reportData = await buildWhatsAppMonthlyReport(requestedMonth);
+    res.json(reportData);
+  } catch (err) {
+    res.status(500).json({ message: 'Error generating WhatsApp report', error: err.message });
+  }
+});
+
+
 // Excel Export Router
 router.get('/reports/export/excel', authenticateToken, async (req, res) => {
   try {
